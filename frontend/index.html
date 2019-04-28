@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+    <head>
+        <meta charset="UTF-8">
+        <title>ws-anywhere</title>
+        <style>
+            body {
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>ws-anywhere</h1>
+        <h3>Customizable WebSocket test server</h3>
+        <div>
+            <p>Whenever the server receives any data, it will response with the JSON you set below.</p>
+            <textarea rows="10" cols="80" placeholder="JSON response"></textarea>
+        </div>
+        <div>
+            <p>Send the desired data back to the connected clients periodically.</p>
+            <textarea rows="10" cols="80" placeholder="JSON response"></textarea><br />
+            <input type="number" style="width: 150px;" placeholder="Period in seconds" min="1" max="5">
+        </div>
+    </body>
+</html>
