@@ -6,7 +6,7 @@
   "scripts": {
     "start": "cross-env node ./backend/server.js",
     "dev": "cross-env nodemon ./backend/server.js",
-    "lint": "eslint backend"
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -29,6 +29,10 @@
     "eslint-plugin-node": "^8.0.1",
     "eslint-plugin-prettier": "^3.0.1",
     "nodemon": "^1.18.11",
+    "pre-commit": "^1.2.2",
     "prettier": "^1.17.0"
-  }
+  },
+  "pre-commit": [
+    "lint"
+  ]
 }
