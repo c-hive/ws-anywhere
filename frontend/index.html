@@ -6,6 +6,18 @@
             body {
                 text-align: center;
             }
+
+            input, textarea {
+                display: block;
+                margin: 0 auto;
+            }
+
+            button {
+                margin: 5px;
+                padding: 5px 10px;
+                background: none;
+                outline: none;
+            }
         </style>
     </head>
     <body>
@@ -13,12 +25,45 @@
         <h3>Customizable WebSocket test server</h3>
         <div>
             <p>Whenever the server receives any data, it will response with the JSON you set below.</p>
-            <textarea rows="10" cols="80" placeholder="JSON response"></textarea>
+            <textarea id="onRequestDataTextArea" rows="10" cols="80" placeholder="JSON response"></textarea>
+            <button type="button" onclick="postOnRequestData()">Confirm</button>
         </div>
         <div>
             <p>Send the desired data back to the connected clients periodically.</p>
-            <textarea rows="10" cols="80" placeholder="JSON response"></textarea><br />
-            <input type="number" style="width: 150px;" placeholder="Period in seconds" min="1" max="5">
+            <textarea rows="10" id="periodicDataTextArea" cols="80" placeholder="JSON response"></textarea>
+            <input type="number" id="periodInSeconds" style="width: 150px;" placeholder="Period in seconds" min="1" max="5">
+            <button type="button" onclick="postPeriodicData()">Confirm</button>
         </div>
+
+        <script>
+            function postOnRequestData() {
+                const xhr = new XMLHttpRequest();
+                const postRequestUrl = window.location.href + 'onrequest';
+                const onRequestData = document.getElementById('onRequestDataTextArea').value;
+
+                xhr.open('POST', postRequestUrl, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+
+                xhr.send(onRequestData);
+            }
+
+            function postPeriodicData() {
+                const xhr = new XMLHttpRequest();
+                const postRequestUrl = window.location.href + 'periodic';
+                const responseData = document.getElementById('periodicDataTextArea').value;
+
+                const oneSecondInMilliseconds = 1000;
+                const periodInSeconds = document.getElementById('periodInSeconds').value * oneSecondInMilliseconds;
+
+                const periodicData = {
+                    responseData,
+                    periodInSeconds,
+                };
+
+                xhr.open('POST', postRequestUrl, true);
+                xhr.setRequestHeader('Content-Type', 'application/json');
+                xhr.send(JSON.stringify(periodicData));
+            }
+        </script>
     </body>
 </html>
