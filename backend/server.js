@@ -6,10 +6,10 @@ require('express-ws')(app);
 const JavaScriptUtils = require('./utils/JavaScriptUtils/JavaScriptUtils');
 const WsSettingsClass = require('./utils/resources/WsSettings/WsSettings');
 
+const WsSettings = new WsSettingsClass();
+
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-const WsSettings = new WsSettingsClass();
 
 app.post('/onrequest', (req) => {
 	WsSettings.setOnRequestData(req.body);
