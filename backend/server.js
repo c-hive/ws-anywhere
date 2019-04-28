@@ -11,11 +11,11 @@ const WsSettings = new WsSettingsClass();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.post('/onrequest', (req) => {
+app.post('/onrequestdata', (req) => {
 	WsSettings.setOnRequestData(req.body);
 });
 
-app.post('/periodic', (req) => {
+app.post('/periodicdata', (req) => {
 	WsSettings.setPeriodicData(req.body);
 });
 
