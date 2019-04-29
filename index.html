@@ -27,14 +27,14 @@
         <div>
             <p>1. Send the data back to a particular client on each request. This occurs whenever the server receives an `onmessage` event.</p>
             <form method="POST" id="onRequestDataForm" target="dummyframe">
-                <textarea name="responseData" rows="10" cols="80" placeholder="JSON response"></textarea>
+                <textarea name="dummyResponseData" rows="10" cols="80" placeholder="JSON response"></textarea>
                 <button type="submit" id="onRequestDataConfirmButton" value="Submit">Confirm</button>
             </form>
         </div>
         <div>
             <p>2. Send the data back to a particular client periodically. The period of the intervals is customizable.</p>
             <form method="POST" id="periodicDataForm" target="dummyframe">
-                <textarea name="responseData" rows="10" cols="80" placeholder="JSON response"></textarea>
+                <textarea name="dummyResponseData" rows="10" cols="80" placeholder="JSON response"></textarea>
                 <input name="periodInSeconds" type="number" style="width: 150px;" placeholder="Period in seconds" min="1" />
                 <button type="submit" id="periodicDataConfirmButton" value="Submit">Confirm</button>
             </form>

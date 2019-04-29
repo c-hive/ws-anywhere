@@ -3,12 +3,12 @@ const javaScriptUtils = require("../../utils/javascript-utils/");
 class WebsocketUserSettings {
   constructor() {
     this.onRequest = {
-      responseData: {}
+      dummyResponseData: {}
     };
 
     this.periodic = {
-      responseData: {},
-      seconds: 0
+      dummyResponseData: {},
+      intervalInMilliseconds: 0
     };
   }
 
@@ -20,14 +20,16 @@ class WebsocketUserSettings {
 
   setOnRequestData(data) {
     this.onRequest = {
-      responseData: javaScriptUtils.deepCopyObject(data.responseData)
+      dummyResponseData: javaScriptUtils.deepCopyObject(data.dummyResponseData)
     };
   }
 
   setPeriodicData(data) {
     this.periodic = {
-      responseData: javaScriptUtils.deepCopyObject(data.responseData),
-      seconds: this.convertSecondsToMilliseconds(Number(data.periodInSeconds))
+      dummyResponseData: javaScriptUtils.deepCopyObject(data.dummyResponseData),
+      intervalInMilliseconds: this.convertSecondsToMilliseconds(
+        Number(data.periodInSeconds)
+      )
     };
   }
 }

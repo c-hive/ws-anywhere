@@ -5,20 +5,24 @@ module.exports = function(app, webSocketUserSettings) {
     ws.on("message", () => {
       if (
         javaScriptUtils.objectIsNotEmpty(
-          webSocketUserSettings.onRequest.responseData
+          webSocketUserSettings.onRequest.dummyResponseData
         )
       ) {
-        ws.send(JSON.stringify(webSocketUserSettings.onRequest.responseData));
+        ws.send(
+          JSON.stringify(webSocketUserSettings.onRequest.dummyResponseData)
+        );
       }
 
       if (
         javaScriptUtils.objectIsNotEmpty(
-          webSocketUserSettings.periodic.responseData
+          webSocketUserSettings.periodic.dummyResponseData
         )
       ) {
         setInterval(() => {
-          ws.send(JSON.stringify(webSocketUserSettings.periodic.responseData));
-        }, webSocketUserSettings.periodic.seconds);
+          ws.send(
+            JSON.stringify(webSocketUserSettings.periodic.dummyResponseData)
+          );
+        }, webSocketUserSettings.periodic.intervalInMilliseconds);
       }
     });
   });
