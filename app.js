@@ -30,7 +30,14 @@ app.ws("/", ws => {
 
   if (javaScriptUtils.objectIsNotEmpty(settings.periodic.dummyResponseData)) {
     setInterval(() => {
-      ws.send(JSON.stringify(settings.periodic.dummyResponseData));
+      const isConnectionOpen = ws.readyState === ws.OPEN;
+
+      if (isConnectionOpen) {
+        ws.send(JSON.stringify(settings.periodic.dummyResponseData));
+      } else {
+        // It might not be necessary, but good to close the connection safely.
+        ws.close();
+      }
     }, settings.periodic.intervalInMilliseconds);
   }
 });
