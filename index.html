@@ -27,18 +27,22 @@
     </head>
     <body>
         <h1>ws-anywhere</h1>
-        <h3>Customizable WebSocket test server</h3>
-        <p>The objects are serialized as the WebSocket API doens't support sending raw objects. As a result, the received dummy data in the client side will be stringified by <i>JSON.stringify()</i>.</p>
-        <p>There are two different ways to use the server:</p>
+        <h2>Customizable WebSocket test server</h2>
+        <p>WebSocket connections can only be established on the index route.</p>
+        <p>The objects are serialized as the WebSocket API doens't support sending raw objects. As a result, the received dummy data in the client side is stringified by <i>JSON.stringify()</i>.</p>
+        <h3>How to use?</h3>
+        <p>There are two different ways to use the server:
         <div>
-            <p>1. Send the data back to a particular client on each request. This occurs whenever the server receives an `onmessage` event.</p>
+            <h4>1. PER REQUEST</h4>
+            <p>This is evoked whenever the server receives <i>send</i> events.</p>
             <form method="POST" id="onRequestDataForm" target="dummyframe">
                 <textarea name="dummyResponseData" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
                 <button type="submit" id="onRequestDataConfirmButton" value="Submit">Confirm</button>
             </form>
         </div>
         <div>
-            <p>2. Send the data back to a particular client periodically. The period of the intervals is customizable.</p>
+            <h4>2. PERIODIC</h4>
+            <p>The period of the intervals is customizable. As a side note, this occurs immediately after connecting to the server - depending on the interval you set.</p>
             <form method="POST" id="periodicDataForm" target="dummyframe">
                 <textarea name="dummyResponseData" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
                 <input name="periodInSeconds" type="number" style="width: 150px;" placeholder="Period in seconds" min="1" />

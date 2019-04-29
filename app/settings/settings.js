@@ -1,6 +1,6 @@
-const javaScriptUtils = require("../../utils/javascript-utils/");
+const javaScriptUtils = require("../utils/javascript-utils/javascript-utils");
 
-class WebsocketUserSettings {
+class Settings {
   constructor() {
     this.onRequest = {
       dummyResponseData: {}
@@ -34,4 +34,4 @@ class WebsocketUserSettings {
   }
 }
 
-module.exports = WebsocketUserSettings;
+module.exports = Settings;
