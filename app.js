@@ -30,6 +30,7 @@ app.ws("/", ws => {
 
   if (javaScriptUtils.objectIsNotEmpty(settings.periodic.dummyResponseData)) {
     setInterval(() => {
+      // https://github.com/websockets/ws/issues/793
       const isConnectionOpen = ws.readyState === ws.OPEN;
 
       if (isConnectionOpen) {
