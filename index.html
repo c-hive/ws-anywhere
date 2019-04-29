@@ -39,7 +39,7 @@
         <script>
             function postOnRequestData() {
                 const xhr = new XMLHttpRequest();
-                const postRequestUrl = window.location.href + 'onrequestdata';
+                const postRequestUrl = window.location.href + 'settings/onrequestdata';
                 const onRequestData = document.getElementById('onRequestDataTextArea').value;
 
                 xhr.open('POST', postRequestUrl, true);
@@ -50,7 +50,7 @@
 
             function postPeriodicData() {
                 const xhr = new XMLHttpRequest();
-                const postRequestUrl = window.location.href + 'periodicdata';
+                const postRequestUrl = window.location.href + 'settings/periodicdata';
                 const responseData = document.getElementById('periodicDataTextArea').value;
 
                 const oneSecondInMilliseconds = 1000;

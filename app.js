@@ -11,7 +11,7 @@ const webSocketUserSettings = new WebsocketUserSettings();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-initialize.endPoints(app);
+initialize.endPoints(app, webSocketUserSettings);
 initialize.webSocketServer(app, webSocketUserSettings);
 
 app
