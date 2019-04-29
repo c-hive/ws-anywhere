@@ -23,13 +23,14 @@
     <body>
         <h1>ws-anywhere</h1>
         <h3>Customizable WebSocket test server</h3>
+        <p>There are two different ways to use the server:</p>
         <div>
-            <p>Whenever the server receives any data, it will response with the JSON you set below.</p>
+            <p>1. Send the data back to a particular client on each request. This occurs whenever the server receives an `onmessage` event.</p>
             <textarea id="onRequestDataTextArea" rows="10" cols="80" placeholder="JSON response"></textarea>
             <button type="button" onclick="postOnRequestData()">Confirm</button>
         </div>
         <div>
-            <p>Send the desired data back to the connected clients periodically.</p>
+            <p>2. Send the data back to a particular client periodically. The period of the intervals is customizable.</p>
             <textarea rows="10" id="periodicDataTextArea" cols="80" placeholder="JSON response"></textarea>
             <input type="number" id="periodInSeconds" style="width: 150px;" placeholder="Period in seconds" min="1" max="5">
             <button type="button" onclick="postPeriodicData()">Confirm</button>
