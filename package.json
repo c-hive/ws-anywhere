@@ -4,9 +4,9 @@
   "description": "#### Customizable WebSocket test server in 3 easy steps: - [Fork me](https://github.com/c-hive/ws-anywhere/fork) - Connect to Heroku (or deploy elsewhere) - Set responses on the server's UI",
   "main": "index.js",
   "scripts": {
-    "start": "cross-env node ./backend/server.js",
-    "dev": "cross-env nodemon ./backend/server.js",
-    "lint": "eslint backend"
+    "start": "cross-env node server.js",
+    "dev": "cross-env nodemon server.js",
+    "lint": "eslint ."
   },
   "repository": {
     "type": "git",
@@ -25,7 +25,14 @@
   "devDependencies": {
     "cross-env": "^5.2.0",
     "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-node": "^8.0.1",
-    "nodemon": "^1.18.11"
-  }
+    "eslint-plugin-prettier": "^3.0.1",
+    "nodemon": "^1.18.11",
+    "pre-commit": "^1.2.2",
+    "prettier": "^1.17.0"
+  },
+  "pre-commit": [
+    "lint"
+  ]
 }
