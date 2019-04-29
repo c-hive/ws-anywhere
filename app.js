@@ -11,7 +11,7 @@ const settings = new Settings();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.post("/settings/onrequestdata", req => {
+app.post("/settings/perrequestdata", req => {
   settings.setPerRequestData(req.body);
 });
 
