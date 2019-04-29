@@ -2,7 +2,7 @@ const javaScriptUtils = require("../utils/javascript-utils/javascript-utils");
 
 class Settings {
   constructor() {
-    this.onRequest = {
+    this.perRequest = {
       dummyResponseData: {}
     };
 
@@ -18,8 +18,8 @@ class Settings {
     return seconds * oneSecondInMilliseconds;
   }
 
-  setOnRequestData(data) {
-    this.onRequest = {
+  setPerRequestData(data) {
+    this.perRequest = {
       dummyResponseData: javaScriptUtils.deepCopyObject(data.dummyResponseData)
     };
   }

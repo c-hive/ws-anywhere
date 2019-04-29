@@ -12,7 +12,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
 app.post("/settings/onrequestdata", req => {
-  settings.setOnRequestData(req.body);
+  settings.setPerRequestData(req.body);
 });
 
 app.post("/settings/periodicdata", req => {
@@ -22,9 +22,9 @@ app.post("/settings/periodicdata", req => {
 app.ws("/", ws => {
   ws.on("message", () => {
     if (
-      javaScriptUtils.objectIsNotEmpty(settings.onRequest.dummyResponseData)
+      javaScriptUtils.objectIsNotEmpty(settings.perRequest.dummyResponseData)
     ) {
-      ws.send(JSON.stringify(settings.onRequest.dummyResponseData));
+      ws.send(JSON.stringify(settings.perRequest.dummyResponseData));
     }
   });
 
