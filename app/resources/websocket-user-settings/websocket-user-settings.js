@@ -10,8 +10,12 @@ class WebsocketUserSettings {
       responseData: {},
       seconds: 0
     };
+  }
 
-    this.oneMinInMilliseconds = 1000;
+  convertSecondsToMilliseconds(seconds) {
+    const oneSecondInMilliseconds = 1000;
+
+    return seconds * oneSecondInMilliseconds;
   }
 
   setOnRequestData(data) {
@@ -23,7 +27,7 @@ class WebsocketUserSettings {
   setPeriodicData(data) {
     this.periodic = {
       responseData: javaScriptUtils.deepCopyObject(data.responseData),
-      seconds: Number(data.periodInSeconds) * this.oneMinInMilliseconds
+      seconds: this.convertSecondsToMilliseconds(Number(data.periodInSeconds))
     };
   }
 }
