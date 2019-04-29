@@ -5,24 +5,25 @@ class WebsocketUserSettings {
     this.onRequest = {
       responseData: {}
     };
+
     this.periodic = {
       responseData: {},
       seconds: 0
     };
+
+    this.oneMinInMilliseconds = 1000;
   }
 
-  setOnRequestData(responseData) {
+  setOnRequestData(data) {
     this.onRequest = {
-      responseData: javaScriptUtils.deepCopyObject(responseData)
+      responseData: javaScriptUtils.deepCopyObject(data.responseData)
     };
   }
 
   setPeriodicData(data) {
     this.periodic = {
-      responseData: JSON.parse(
-        javaScriptUtils.deepCopyObject(data.responseData)
-      ),
-      seconds: data.periodInSeconds
+      responseData: javaScriptUtils.deepCopyObject(data.responseData),
+      seconds: Number(data.periodInSeconds) * this.oneMinInMilliseconds
     };
   }
 }

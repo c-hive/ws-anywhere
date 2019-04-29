@@ -26,45 +26,26 @@
         <p>There are two different ways to use the server:</p>
         <div>
             <p>1. Send the data back to a particular client on each request. This occurs whenever the server receives an `onmessage` event.</p>
-            <textarea id="onRequestDataTextArea" rows="10" cols="80" placeholder="JSON response"></textarea>
-            <button type="button" onclick="postOnRequestData()">Confirm</button>
+            <form method="POST" id="onRequestDataForm" target="dummyframe">
+                <textarea name="responseData" rows="10" cols="80" placeholder="JSON response"></textarea>
+                <button type="submit" id="onRequestDataConfirmButton" value="Submit">Confirm</button>
+            </form>
         </div>
         <div>
             <p>2. Send the data back to a particular client periodically. The period of the intervals is customizable.</p>
-            <textarea rows="10" id="periodicDataTextArea" cols="80" placeholder="JSON response"></textarea>
-            <input type="number" id="periodInSeconds" style="width: 150px;" placeholder="Period in seconds" min="1" max="5">
-            <button type="button" onclick="postPeriodicData()">Confirm</button>
+            <form method="POST" id="periodicDataForm" target="dummyframe">
+                <textarea name="responseData" rows="10" cols="80" placeholder="JSON response"></textarea>
+                <input name="periodInSeconds" type="number" style="width: 150px;" placeholder="Period in seconds" min="1" />
+                <button type="submit" id="periodicDataConfirmButton" value="Submit">Confirm</button>
+            </form>
         </div>
 
+        <!-- https://stackoverflow.com/a/28060195/9599137 -->
+        <iframe width="0" height="0" style="display: none;" border="0" name="dummyframe" id="dummyframe"></iframe>
+
         <script>
-            function postOnRequestData() {
-                const xhr = new XMLHttpRequest();
-                const postRequestUrl = window.location.href + 'settings/onrequestdata';
-                const onRequestData = document.getElementById('onRequestDataTextArea').value;
-
-                xhr.open('POST', postRequestUrl, true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
-
-                xhr.send(onRequestData);
-            }
-
-            function postPeriodicData() {
-                const xhr = new XMLHttpRequest();
-                const postRequestUrl = window.location.href + 'settings/periodicdata';
-                const responseData = document.getElementById('periodicDataTextArea').value;
-
-                const oneSecondInMilliseconds = 1000;
-                const periodInSeconds = document.getElementById('periodInSeconds').value * oneSecondInMilliseconds;
-
-                const periodicData = {
-                    responseData,
-                    periodInSeconds,
-                };
-
-                xhr.open('POST', postRequestUrl, true);
-                xhr.setRequestHeader('Content-Type', 'application/json');
-                xhr.send(JSON.stringify(periodicData));
-            }
+            document.getElementById("onRequestDataForm").action = window.location.href + 'settings/onrequestdata';
+            document.getElementById("periodicDataForm").action = window.location.href + 'settings/periodicdata';
         </script>
     </body>
 </html>
