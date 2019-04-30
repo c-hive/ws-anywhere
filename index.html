@@ -58,7 +58,8 @@
                     },
                     method: "POST",
                     body: dummyResponseData,
-                });
+                }).then(res => res.text())
+                .then(parsedResponse => console.log(parsedResponse));
             }
 
             function postPeriodicData() {
@@ -78,7 +79,8 @@
                     },
                     method: "POST",
                     body: JSON.stringify(data),
-                });
+                }).then(res => res.text())
+                .then(parsedResponse => console.log(parsedResponse));;
             }
         </script>
     </body>

@@ -11,12 +11,16 @@ const settings = new Settings();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-app.post("/settings/perrequestdata", req => {
+app.post("/settings/perrequestdata", (req, res) => {
   settings.setPerRequestData(req.body);
+
+  res.send("OK");
 });
 
-app.post("/settings/periodicdata", req => {
+app.post("/settings/periodicdata", (req, res) => {
   settings.setPeriodicData(req.body);
+
+  res.send("OK");
 });
 
 app.ws("/", ws => {
