@@ -14,13 +14,17 @@ app.use(bodyParser.json());
 app.post("/settings/perrequestdata", (req, res) => {
   settings.setPerRequestData(req.body);
 
-  res.send("OK");
+  res.json({
+    success: true
+  });
 });
 
 app.post("/settings/periodicdata", (req, res) => {
   settings.setPeriodicData(req.body);
 
-  res.send("OK");
+  res.send({
+    success: true
+  });
 });
 
 app.ws("/", ws => {
