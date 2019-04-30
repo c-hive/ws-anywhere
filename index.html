@@ -35,27 +35,51 @@
         <div>
             <h4>1. PER REQUEST</h4>
             <p>This is evoked whenever the server receives <i>send</i> events.</p>
-            <form method="POST" id="onRequestDataForm" target="dummyframe">
-                <textarea name="dummyResponseData" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
-                <button type="submit" id="onRequestDataConfirmButton" value="Submit">Confirm</button>
-            </form>
+            <textarea id="perRequestData" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
+            <button type="button" id="perRequestButton" onclick="postPerRequestData()">Confirm</button>
         </div>
         <div>
             <h4>2. PERIODIC</h4>
             <p>The period of the intervals is customizable. As a side note, this occurs immediately after connecting to the server - depending on the interval you set.</p>
-            <form method="POST" id="periodicDataForm" target="dummyframe">
-                <textarea name="dummyResponseData" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
-                <input name="periodInSeconds" type="number" style="width: 150px;" placeholder="Period in seconds" min="1" />
-                <button type="submit" id="periodicDataConfirmButton" value="Submit">Confirm</button>
-            </form>
+            <textarea id="periodicData" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
+            <input id="periodInSeconds" type="number" style="width: 150px;" placeholder="Period in seconds" min="1" />
+            <button type="button" id="periodicButton" onclick="postPeriodicData()">Confirm</button>
         </div>
 
-        <!-- https://stackoverflow.com/a/28060195/9599137 -->
-        <iframe width="0" height="0" style="display: none;" border="0" name="dummyframe" id="dummyframe"></iframe>
-
         <script>
-            document.getElementById("onRequestDataForm").action = window.location.href + 'settings/perrequestdata';
-            document.getElementById("periodicDataForm").action = window.location.href + 'settings/periodicdata';
+            function postPerRequestData() {
+                const dummyResponseData = document.getElementById("perRequestData").value;
+                const postUrl = window.location.href + 'settings/perrequestdata';
+
+                fetch(postUrl, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    method: "POST",
+                    body: dummyResponseData,
+                });
+            }
+
+            function postPeriodicData() {
+                const dummyResponseData = document.getElementById("periodicData").value;
+                const periodInSeconds = document.getElementById("periodInSeconds").value;
+                const postUrl = window.location.href + 'settings/periodicdata';
+
+                const data = {
+                    dummyResponseData,
+                    periodInSeconds,
+                };
+
+                fetch(postUrl, {
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    method: "POST",
+                    body: JSON.stringify(data),
+                });
+            }
         </script>
     </body>
 </html>

@@ -20,7 +20,7 @@ class Settings {
 
   setPerRequestData(data) {
     this.perRequest = {
-      dummyResponseData: javaScriptUtils.deepCopyObject(data.dummyResponseData)
+      dummyResponseData: javaScriptUtils.deepCopyObject(data)
     };
   }
 
