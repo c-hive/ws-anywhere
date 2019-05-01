@@ -51,6 +51,7 @@
 
             window.onload = function() {
                 const getUrl = pageUrl + "settings/current";
+
                 fetch(getUrl)
                     .then(res => res.json())
                     .then(parsedResponse => {
