@@ -3,11 +3,11 @@ const javaScriptUtils = require("../utils/javascript-utils/javascript-utils");
 class Settings {
   constructor() {
     this.perRequest = {
-      dummyResponseData: {}
+      dummyData: {}
     };
 
     this.periodic = {
-      dummyResponseData: {},
+      dummyData: {},
       intervalInMilliseconds: 0
     };
   }
@@ -20,16 +20,23 @@ class Settings {
 
   setPerRequestData(data) {
     this.perRequest = {
-      dummyResponseData: javaScriptUtils.deepCopyObject(data)
+      dummyData: javaScriptUtils.deepCopyObject(data)
     };
   }
 
   setPeriodicData(data) {
     this.periodic = {
-      dummyResponseData: javaScriptUtils.deepCopyObject(data.dummyResponseData),
+      dummyData: javaScriptUtils.deepCopyObject(data.dummyData),
       intervalInMilliseconds: this.convertSecondsToMilliseconds(
         Number(data.periodInSeconds)
       )
+    };
+  }
+
+  getCurrentSettings() {
+    return {
+      perRequest: javaScriptUtils.deepCopyObject(this.perRequest),
+      periodic: javaScriptUtils.deepCopyObject(this.periodic)
     };
   }
 }

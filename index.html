@@ -36,20 +36,48 @@
             <h4>1. PER REQUEST</h4>
             <p>This is evoked whenever the server receives <i>send</i> events.</p>
             <textarea id="perRequestData" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
-            <button type="button" id="perRequestButton" onclick="postPerRequestData()">Confirm</button>
+            <button type="button" id="perRequestButton" onclick="postPerRequestSettings()">Confirm</button>
         </div>
         <div>
             <h4>2. PERIODIC</h4>
             <p>The period of the intervals is customizable. As a side note, this occurs immediately after connecting to the server - depending on the interval you set.</p>
             <textarea id="periodicData" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
             <input id="periodInSeconds" type="number" style="width: 150px;" placeholder="Period in seconds" min="1" />
-            <button type="button" id="periodicButton" onclick="postPeriodicData()">Confirm</button>
+            <button type="button" id="periodicButton" onclick="postPeriodicSettings()">Confirm</button>
         </div>
 
         <script>
-            function postPerRequestData() {
-                const dummyResponseData = document.getElementById("perRequestData").value;
-                const postUrl = window.location.href + 'settings/perrequestdata';
+            const pageUrl = window.location.href;
+
+            window.onload = function() {
+                const getUrl = pageUrl + "settings/current";
+                fetch(getUrl)
+                    .then(res => res.json())
+                    .then(parsedResponse => {
+                        setInputValues(parsedResponse);
+                    });
+            }
+
+            function objectIsNotEmpty(object) {
+                return Object.keys(object).length !== 0;
+            }
+
+            function setInputValues(data) {
+                const oneSecondInMilliseconds = 1000;
+
+                if (objectIsNotEmpty(data.currentSettings.perRequest.dummyData)) {
+                    document.getElementById("perRequestData").value = JSON.stringify(data.currentSettings.perRequest.dummyData, undefined, 2);
+                }
+
+                if (objectIsNotEmpty(data.currentSettings.periodic.dummyData)) {
+                    document.getElementById("periodicData").value = data.currentSettings.periodic.dummyData;
+                    document.getElementById("periodInSeconds").value = data.currentSettings.periodic.intervalInMilliseconds / oneSecondInMilliseconds;
+                }
+            }
+
+            function postPerRequestSettings() {
+                const dummyData = document.getElementById("perRequestData").value;
+                const postUrl = pageUrl + 'settings/perrequestdata';
 
                 fetch(postUrl, {
                     headers: {
@@ -57,18 +85,23 @@
                         'Content-Type': 'application/json'
                     },
                     method: "POST",
-                    body: dummyResponseData,
-                }).then(res => res.json())
-                .then(parsedResponse => console.log(parsedResponse));
+                    body: dummyData,
+                })
+                .then(res => res.json())
+                .then(parsedResponse => {
+                    if (parsedResponse.success) {
+                        setInputValues(parsedResponse);
+                    }
+                });
             }
 
-            function postPeriodicData() {
-                const dummyResponseData = document.getElementById("periodicData").value;
+            function postPeriodicSettings() {
+                const dummyData = document.getElementById("periodicData").value;
                 const periodInSeconds = document.getElementById("periodInSeconds").value;
-                const postUrl = window.location.href + 'settings/periodicdata';
+                const postUrl = pageUrl + 'settings/periodicdata';
 
                 const data = {
-                    dummyResponseData,
+                    dummyData,
                     periodInSeconds,
                 };
 
@@ -79,8 +112,13 @@
                     },
                     method: "POST",
                     body: JSON.stringify(data),
-                }).then(res => res.json())
-                .then(parsedResponse => console.log(parsedResponse));
+                })
+                .then(res => res.json())
+                .then(parsedResponse => {
+                    if (parsedResponse.success) {
+                        setInputValues(parsedResponse);
+                    }
+                });
             }
         </script>
     </body>
