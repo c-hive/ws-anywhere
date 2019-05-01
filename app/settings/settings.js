@@ -18,17 +18,17 @@ class Settings {
     return seconds * oneSecondInMilliseconds;
   }
 
-  setPerRequestData(data) {
+  setPerRequestSettings(perRequestDummyData) {
     this.perRequest = {
-      dummyData: javaScriptUtils.deepCopyObject(data)
+      dummyData: javaScriptUtils.deepCopyObject(perRequestDummyData)
     };
   }
 
-  setPeriodicData(data) {
+  setPeriodicSettings(periodicSettings) {
     this.periodic = {
-      dummyData: javaScriptUtils.deepCopyObject(data.dummyData),
+      dummyData: javaScriptUtils.deepCopyObject(periodicSettings.dummyData),
       intervalInMilliseconds: this.convertSecondsToMilliseconds(
-        Number(data.periodInSeconds)
+        Number(periodicSettings.periodInSeconds)
       )
     };
   }
