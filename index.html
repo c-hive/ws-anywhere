@@ -23,6 +23,16 @@
                 background: none;
                 outline: none;
             }
+
+            .iconImg {
+                display: none;
+            }
+
+            .submitBar {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
         </style>
     </head>
     <body>
@@ -32,21 +42,40 @@
         <p>The objects are serialized as the WebSocket API doens't support sending raw objects. As a result, the received dummy data in the client side is stringified by <i>JSON.stringify()</i>.</p>
         <h3>How to use?</h3>
         <p>There are two different ways to use the server:
+
         <div>
             <h4>1. PER REQUEST</h4>
             <p>This is evoked whenever the server receives <i>send</i> events.</p>
             <textarea id="perRequestData" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
-            <button type="button" id="perRequestButton" onclick="postPerRequestSettings()">Confirm</button>
+            <div id="perRequestSubmitBar" class="submitBar">
+                <button type="button" id="perRequestButton" onclick="postPerRequestSettings()">Submit</button>
+            </div>
         </div>
+
         <div>
             <h4>2. PERIODIC</h4>
             <p>The period of the intervals is customizable. As a side note, this occurs immediately after connecting to the server - depending on the interval you set.</p>
             <textarea id="periodicData" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
             <input id="periodInSeconds" type="number" style="width: 150px;" placeholder="Period in seconds" min="1" />
-            <button type="button" id="periodicButton" onclick="postPeriodicSettings()">Confirm</button>
+            <div id="periodicSubmitBar" class="submitBar">
+                <button type="button" id="periodicButton" onclick="postPeriodicSettings()">Submit</button>
+            </div>
         </div>
 
         <script>
+            const iconIds = {
+                perRequest: {
+                    successImg: 'perRequestSuccessImg',
+                    errorImg: 'perRequestErrorImg',
+                    errorMsg: 'perPrequestErrorMsg',
+                },
+                periodic: {
+                    successImg: 'periodicSuccessImg',
+                    errorImg: 'periodicErrorImg',
+                    errorMsg: 'periodicErrorMsg',
+                }
+            };
+
             const pageUrl = window.location.href;
 
             window.onload = function() {
@@ -59,18 +88,138 @@
                     });
             }
 
+            function isDefined(value) {
+                return typeof value !== "undefined" && value !== null;
+            }
+
+            function isObject(value) {
+                return typeof value === "object" && value !== null;
+            }
+
+            function createSuccessImgElement(imgId) {
+                const successImg = document.createElement("IMG");
+
+                successImg.id = imgId;
+                successImg.alt = "Success";
+                successImg.src = pageUrl + "success.png";
+
+                successImg.style.width = "25px";
+                successImg.style.height = "25px";
+
+                return successImg;
+            }
+
+            function createErrorImgElement(imgId) {
+                const errorImg = document.createElement("IMG");
+
+                errorImg.id = imgId;
+                errorImg.alt = "Error";
+                errorImg.src = pageUrl + "error.png";
+
+                errorImg.style.width = "25px";
+                errorImg.style.height = "25px";
+
+                return errorImg;
+            }
+
+            function createErrorMsgElement(spanId, errorMessage) {
+                const errorMsgDisplayer = document.createElement("SPAN");
+
+                errorMsgDisplayer.id = spanId;
+                errorMsgDisplayer.innerText = errorMessage;
+                errorMsgDisplayer.style.fontSize = "11px";
+                errorMsgDisplayer.style.marginLeft = "5px";
+
+                return errorMsgDisplayer;
+            }
+
+            function getStatusElements(iconsIdGroup) {
+                const successImg = document.getElementById(iconsIdGroup.successImg);
+                const errorImg = document.getElementById(iconsIdGroup.errorImg);
+                const errorMsg = document.getElementById(iconsIdGroup.errorMsg);
+
+                return {
+                    successImg,
+                    errorImg,
+                    errorMsg,
+                };
+            }
+
+            function displaySuccessImg(elementId, iconsIdGroup) {
+                const el = document.getElementById(elementId);
+                const statusElements = getStatusElements(iconsIdGroup);
+
+                if (isDefined(statusElements.successImg)) {
+                    statusElements.successImg.style.display = "block";
+                } else {
+                    const newSuccessImg = createSuccessImgElement(iconsIdGroup.successImg);
+
+                    el.appendChild(newSuccessImg);
+                }
+
+                if (isDefined(statusElements.errorImg)) {
+                    statusElements.errorImg.style.display = "none";
+                }
+
+                if (isDefined(statusElements.errorMsg)) {
+                    statusElements.errorMsg.style.display = "none";
+                }
+            }
+
+            function displayErrorImg(elementId, iconsIdGroup, errorMessage) {
+                const el = document.getElementById(elementId);
+                const statusElements = getStatusElements(iconsIdGroup);
+
+                if (isDefined(statusElements.errorImg)) {
+                    statusElements.errorImg.style.display = "block";
+                } else {
+                    const newErrorImg = createErrorImgElement(iconsIdGroup.errorImg);
+
+                    el.appendChild(newErrorImg);
+                }
+
+                if (isDefined(errorMessage)) {
+                    if (isDefined(statusElements.errorMsg)) {
+                        statusElements.errorMsg.style.display = "block";
+                    } else {
+                        const errorMsgElement = createErrorMsgElement(iconsIdGroup.errorMsg, errorMessage);
+
+                        el.appendChild(errorMsgElement);
+                    }
+                }
+
+                if (isDefined(statusElements.successImg)) {
+                    statusElements.successImg.style.display = "none";
+                }
+            }
+
             function objectIsNotEmpty(object) {
                 return Object.keys(object).length !== 0;
             }
 
-            function setInputValues(data) {
-                const oneSecondInMilliseconds = 1000;
+            function isInputDataValid(data) {
+                try {
+                    // Because <textarea /> returns a string by default.
+                    const parsedData = JSON.parse(data);
 
+                    if (isObject(parsedData)) {
+                        return true;
+                    }
+
+                    return false;
+                } catch (err) {
+                    return false;
+                }
+            }
+
+            function setInputValues(data) {
                 if (objectIsNotEmpty(data.currentSettings.perRequest.dummyData)) {
                     document.getElementById("perRequestData").value = JSON.stringify(data.currentSettings.perRequest.dummyData, undefined, 2);
                 }
 
                 if (objectIsNotEmpty(data.currentSettings.periodic.dummyData)) {
+                    const oneSecondInMilliseconds = 1000;
+
                     document.getElementById("periodicData").value = data.currentSettings.periodic.dummyData;
                     document.getElementById("periodInSeconds").value = data.currentSettings.periodic.intervalInMilliseconds / oneSecondInMilliseconds;
                 }
@@ -78,48 +227,73 @@
 
             function postPerRequestSettings() {
                 const dummyData = document.getElementById("perRequestData").value;
-                const postUrl = pageUrl + 'settings/perrequestdata';
 
-                fetch(postUrl, {
+                if (isInputDataValid(dummyData)) {
+                    // TODO: Place it into a separated function.
+                    const postUrl = pageUrl + 'settings/perrequestdata';
+
+                    fetch(postUrl, {
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json'
                     },
                     method: "POST",
                     body: dummyData,
-                })
-                .then(res => res.json())
-                .then(parsedResponse => {
-                    if (parsedResponse.success) {
-                        setInputValues(parsedResponse);
-                    }
-                });
+                    })
+                    .then(res => res.json())
+                    .then(parsedResponse => {
+                        if (parsedResponse.success) {
+                            displaySuccessImg("perRequestSubmitBar", iconIds.perRequest);
+
+                            setInputValues(parsedResponse);
+                        }
+                    })
+                    .catch(err => {
+                        displayErrorImg("perRequestSubmitBar", iconIds.perRequest);
+                    });
+                } else {
+                    const errorMessage = "Invalid JSON format.";
+
+                    displayErrorImg("perRequestSubmitBar", iconIds.perRequest, errorMessage);
+                }
             }
 
             function postPeriodicSettings() {
                 const dummyData = document.getElementById("periodicData").value;
                 const periodInSeconds = document.getElementById("periodInSeconds").value;
-                const postUrl = pageUrl + 'settings/periodicdata';
 
-                const data = {
-                    dummyData,
-                    periodInSeconds,
-                };
+                if (isInputDataValid(dummyData)) {
+                    const postUrl = pageUrl + 'settings/periodicdata';
 
-                fetch(postUrl, {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Content-Type': 'application/json'
-                    },
-                    method: "POST",
-                    body: JSON.stringify(data),
-                })
-                .then(res => res.json())
-                .then(parsedResponse => {
-                    if (parsedResponse.success) {
-                        setInputValues(parsedResponse);
-                    }
-                });
+                    const data = {
+                        dummyData,
+                        periodInSeconds,
+                    };
+
+                    fetch(postUrl, {
+                        headers: {
+                            'Accept': 'application/json',
+                            'Content-Type': 'application/json'
+                        },
+                        method: "POST",
+                        body: JSON.stringify(data),
+                    })
+                    .then(res => res.json())
+                    .then(parsedResponse => {
+                        if (parsedResponse.success) {
+                            displaySuccessImg("periodicSubmitBar", iconIds.periodic);
+
+                            setInputValues(parsedResponse);
+                        }
+                    })
+                    .catch(err => {
+                        displayErrorImg("periodicSubmitBar", iconIds.periodic);
+                    });
+                } else {
+                    const errorMessage = "Invalid JSON format.";
+
+                    displayErrorImg("periodicSubmitBar", iconIds.periodic, errorMessage);
+                }
             }
         </script>
     </body>

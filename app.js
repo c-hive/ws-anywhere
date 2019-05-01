@@ -1,5 +1,8 @@
+const path = require("path");
 const bodyParser = require("body-parser");
-const app = require("express")();
+const express = require("express");
+
+const app = express();
 require("express-ws")(app);
 
 const javaScriptUtils = require("./app/utils/javascript-utils/javascript-utils");
@@ -10,6 +13,7 @@ const settings = new Settings();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, "resources")));
 
 app.get("/settings/current", (req, res) => {
   const currentSettings = settings.getCurrentSettings();
