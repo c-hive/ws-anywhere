@@ -117,7 +117,7 @@ function getElementsGroup(elementIdsGroup) {
   };
 }
 
-function hideElement(el, delayInMs) {
+function hideElementAfterMsElapsed(el, delayInMs) {
   setTimeout(() => {
     el.style.display = "none";
   }, delayInMs);
@@ -131,22 +131,22 @@ function displaySuccessImg(elementIdsGroup) {
   elementsGroup.errorImg.style.display = "none";
   elementsGroup.errorSpan.style.display = "none";
 
-  hideElement(elementsGroup.successImg, 2500);
+  hideElementAfterMsElapsed(elementsGroup.successImg, 2500);
 }
 
-function displayErrorImg(elementIdsGroup, errorMessage) {
+function displayErrorElements(elementIdsGroup, errorMessage) {
   const elementsGroup = getElementsGroup(elementIdsGroup);
 
   elementsGroup.errorImg.style.display = "block";
   elementsGroup.successImg.style.display = "none";
 
-  hideElement(elementsGroup.errorImg, 2500);
+  hideElementAfterMsElapsed(elementsGroup.errorImg, 2500);
 
   if (errorMessage) {
     elementsGroup.errorSpan.style.display = "block";
     elementsGroup.errorSpan.innerText = errorMessage;
 
-    hideElement(elementsGroup.errorSpan, 2500);
+    hideElementAfterMsElapsed(elementsGroup.errorSpan, 2500);
   }
 }
 
@@ -194,12 +194,12 @@ function postPerRequestSettings() {
         }
       })
       .catch(() => {
-        displayErrorImg(elementIds.perRequest);
+        displayErrorElements(elementIds.perRequest);
       });
   } else {
     const errorMessage = "Invalid JSON format.";
 
-    displayErrorImg(elementIds.perRequest, errorMessage);
+    displayErrorElements(elementIds.perRequest, errorMessage);
   }
 }
 
@@ -233,11 +233,11 @@ function postPeriodicSettings() {
         }
       })
       .catch(() => {
-        displayErrorImg(elementIds.periodic);
+        displayErrorElements(elementIds.periodic);
       });
   } else {
     const errorMessage = "Invalid JSON format.";
 
-    displayErrorImg(elementIds.periodic, errorMessage);
+    displayErrorElements(elementIds.periodic, errorMessage);
   }
 }
