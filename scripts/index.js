@@ -123,14 +123,18 @@ function hideElementAfterMsElapsed(el, delayInMs) {
   }, delayInMs);
 }
 
+function hideElements(elements) {
+  elements.forEach(element => {
+    element.style.display = "none";
+  });
+}
+
 function displaySuccessImg(elementIdsGroup) {
   const elementsGroup = getElementsGroup(elementIdsGroup);
 
   elementsGroup.successImg.style.display = "block";
 
-  elementsGroup.errorImg.style.display = "none";
-  elementsGroup.errorSpan.style.display = "none";
-
+  hideElements([elementsGroup.errorImg, elementsGroup.errorSpan]);
   hideElementAfterMsElapsed(elementsGroup.successImg, 2500);
 }
 
@@ -138,8 +142,8 @@ function displayErrorElements(elementIdsGroup, errorMessage) {
   const elementsGroup = getElementsGroup(elementIdsGroup);
 
   elementsGroup.errorImg.style.display = "block";
-  elementsGroup.successImg.style.display = "none";
 
+  hideElements([elementsGroup.successImg]);
   hideElementAfterMsElapsed(elementsGroup.errorImg, 2500);
 
   if (errorMessage) {
