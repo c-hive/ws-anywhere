@@ -13,7 +13,9 @@ const settings = new Settings();
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
 app.use(express.static(path.join(__dirname, "resources")));
+app.use(express.static(path.join(__dirname, "scripts")));
 
 app.get("/settings/current", (req, res) => {
   const currentSettings = settings.getCurrentSettings();
