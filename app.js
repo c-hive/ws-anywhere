@@ -25,8 +25,8 @@ app.get("/settings/current", (req, res) => {
   });
 });
 
-app.post("/settings/perrequestdata", (req, res) => {
-  settings.setPerRequestSettings(req.body);
+app.post("/settings/onevent", (req, res) => {
+  settings.setOnEventSettings(req.body);
 
   const currentSettings = settings.getCurrentSettings();
 
@@ -36,7 +36,7 @@ app.post("/settings/perrequestdata", (req, res) => {
   });
 });
 
-app.post("/settings/periodicdata", (req, res) => {
+app.post("/settings/periodic", (req, res) => {
   settings.setPeriodicSettings(req.body);
 
   const currentSettings = settings.getCurrentSettings();
@@ -59,18 +59,22 @@ app.get("/settings/disconnect", (req, res) => {
 
 app.ws("/", ws => {
   ws.on("message", () => {
-    if (javaScriptUtils.objectIsNotEmpty(settings.perRequest.dummyData)) {
-      ws.send(JSON.stringify(settings.perRequest.dummyData));
+    if (
+      javaScriptUtils.objectIsNotEmpty(settings.perRequest.dummyResponseMessage)
+    ) {
+      ws.send(JSON.stringify(settings.perRequest.dummyResponseMessage));
     }
   });
 
-  if (javaScriptUtils.objectIsNotEmpty(settings.periodic.dummyData)) {
+  if (
+    javaScriptUtils.objectIsNotEmpty(settings.periodic.dummyResponseMessage)
+  ) {
     setInterval(() => {
       // https://github.com/websockets/ws/issues/793
       const isConnectionOpen = ws.readyState === ws.OPEN;
 
       if (isConnectionOpen) {
-        ws.send(JSON.stringify(settings.periodic.dummyData));
+        ws.send(JSON.stringify(settings.periodic.dummyResponseMessage));
       } else {
         // It might not be necessary, but good to close the connection safely.
         ws.close();

@@ -1,8 +1,8 @@
 const elementIds = {
-  perRequest: {
-    successImg: "perRequestSuccessImg",
-    errorImg: "perRequestErrorImg",
-    errorSpan: "perRequestErrorSpan"
+  onEvent: {
+    successImg: "onEventSuccessImg",
+    errorImg: "onEventErrorImg",
+    errorSpan: "onEventErrorSpan"
   },
   periodic: {
     successImg: "periodicSuccessImg",
@@ -24,19 +24,19 @@ window.onload = function() {
 };
 
 function createSubmitBarElements() {
-  const perRequestSubmitBar = document.getElementById("perRequestSubmitBar");
+  const onEventSubmitBar = document.getElementById("onEventSubmitBar");
   const periodicSubmitBar = document.getElementById("periodicSubmitBar");
 
-  const perRequestElements = getPreparedHTMLElements(elementIds.perRequest);
-  const periodicElements = getPreparedHTMLElements(elementIds.periodic);
+  const onEventHTMLElements = getPreparedHTMLElements(elementIds.onEvent);
+  const periodicHTMLElements = getPreparedHTMLElements(elementIds.periodic);
 
-  perRequestSubmitBar.appendChild(perRequestElements.successImg);
-  perRequestSubmitBar.appendChild(perRequestElements.errorImg);
-  perRequestSubmitBar.appendChild(perRequestElements.errorSpan);
+  onEventSubmitBar.appendChild(onEventHTMLElements.successImg);
+  onEventSubmitBar.appendChild(onEventHTMLElements.errorImg);
+  onEventSubmitBar.appendChild(onEventHTMLElements.errorSpan);
 
-  periodicSubmitBar.appendChild(periodicElements.successImg);
-  periodicSubmitBar.appendChild(periodicElements.errorImg);
-  periodicSubmitBar.appendChild(periodicElements.errorSpan);
+  periodicSubmitBar.appendChild(periodicHTMLElements.successImg);
+  periodicSubmitBar.appendChild(periodicHTMLElements.errorImg);
+  periodicSubmitBar.appendChild(periodicHTMLElements.errorSpan);
 }
 
 function getPreparedHTMLElements(elementIdsGroup) {
@@ -156,19 +156,19 @@ function displayErrorElements(elementIdsGroup, errorMessage) {
 }
 
 function setInputValues(data) {
-  if (objectIsNotEmpty(data.currentSettings.perRequest.dummyData)) {
-    document.getElementById("perRequestData").value = JSON.stringify(
-      data.currentSettings.perRequest.dummyData,
+  if (objectIsNotEmpty(data.currentSettings.onEvent.dummyResponseMessage)) {
+    document.getElementById("onEventResponseMessage").value = JSON.stringify(
+      data.currentSettings.onEvent.dummyResponseMessage,
       undefined,
       2
     );
   }
 
-  if (objectIsNotEmpty(data.currentSettings.periodic.dummyData)) {
+  if (objectIsNotEmpty(data.currentSettings.periodic.dummyResponseMessage)) {
     const oneSecondInMilliseconds = 1000;
 
-    document.getElementById("periodicData").value =
-      data.currentSettings.periodic.dummyData;
+    document.getElementById("periodicResponseMessage").value =
+      data.currentSettings.periodic.dummyResponseMessage;
     document.getElementById("periodInSeconds").value =
       data.currentSettings.periodic.intervalInMilliseconds /
       oneSecondInMilliseconds;
@@ -176,11 +176,13 @@ function setInputValues(data) {
 }
 
 // eslint-disable-next-line no-unused-vars
-function postPerRequestSettings() {
-  const dummyData = document.getElementById("perRequestData").value;
+function submitOnEventSettings() {
+  const onEventResponseMessage = document.getElementById(
+    "onEventResponseMessage"
+  ).value;
 
-  if (isInputDataValid(dummyData)) {
-    const postUrl = "settings/perrequestdata";
+  if (isInputDataValid(onEventResponseMessage)) {
+    const postUrl = "settings/onevent";
 
     fetch(postUrl, {
       headers: {
@@ -188,36 +190,38 @@ function postPerRequestSettings() {
         "Content-Type": "application/json"
       },
       method: "POST",
-      body: dummyData
+      body: onEventResponseMessage
     })
       .then(response => response.json())
       .then(parsedResponse => {
         if (parsedResponse.success) {
-          displaySuccessImg(elementIds.perRequest);
+          displaySuccessImg(elementIds.onEvent);
 
           setInputValues(parsedResponse);
         }
       })
       .catch(() => {
-        displayErrorElements(elementIds.perRequest);
+        displayErrorElements(elementIds.onEvent);
       });
   } else {
     const errorMessage = "Invalid JSON format.";
 
-    displayErrorElements(elementIds.perRequest, errorMessage);
+    displayErrorElements(elementIds.onEvent, errorMessage);
   }
 }
 
 // eslint-disable-next-line no-unused-vars
-function postPeriodicSettings() {
-  const dummyData = document.getElementById("periodicData").value;
+function submitPeriodicSettings() {
+  const periodicResponseMessage = document.getElementById(
+    "periodicResponseMessage"
+  ).value;
   const periodInSeconds = document.getElementById("periodInSeconds").value;
 
-  if (isInputDataValid(dummyData)) {
-    const postUrl = "settings/periodicdata";
+  if (isInputDataValid(periodicResponseMessage)) {
+    const postUrl = "settings/periodic";
 
     const data = {
-      dummyData,
+      responseMessage: periodicResponseMessage,
       periodInSeconds
     };
 
@@ -257,7 +261,7 @@ function disconnectAllClients() {
       .then(parsedResponse => {
         if (parsedResponse.success) {
           // eslint-disable-next-line no-console
-          console.log("[Successfully disconnected the clients.]");
+          console.log("[Successfully disconnected all the clients.]");
         }
       });
   }

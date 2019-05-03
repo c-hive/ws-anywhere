@@ -2,12 +2,12 @@ const javaScriptUtils = require("../utils/javascript-utils/javascript-utils");
 
 class Settings {
   constructor() {
-    this.perRequest = {
-      dummyData: {}
+    this.onEvent = {
+      dummyResponseMessage: {}
     };
 
     this.periodic = {
-      dummyData: {},
+      dummyResponseMessage: {},
       intervalInMilliseconds: 0
     };
   }
@@ -18,15 +18,19 @@ class Settings {
     return seconds * oneSecondInMilliseconds;
   }
 
-  setPerRequestSettings(perRequestDummyData) {
-    this.perRequest = {
-      dummyData: javaScriptUtils.deepCopyObject(perRequestDummyData)
+  setOnEventSettings(onEventResponseMessage) {
+    this.onEvent = {
+      dummyResponseMessage: javaScriptUtils.deepCopyObject(
+        onEventResponseMessage
+      )
     };
   }
 
   setPeriodicSettings(periodicSettings) {
     this.periodic = {
-      dummyData: javaScriptUtils.deepCopyObject(periodicSettings.dummyData),
+      dummyResponseMessage: javaScriptUtils.deepCopyObject(
+        periodicSettings.responseMessage
+      ),
       intervalInMilliseconds: this.convertSecondsToMilliseconds(
         Number(periodicSettings.periodInSeconds)
       )
@@ -35,7 +39,7 @@ class Settings {
 
   getCurrentSettings() {
     return {
-      perRequest: javaScriptUtils.deepCopyObject(this.perRequest),
+      onEvent: javaScriptUtils.deepCopyObject(this.onEvent),
       periodic: javaScriptUtils.deepCopyObject(this.periodic)
     };
   }
