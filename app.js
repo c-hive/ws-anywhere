@@ -3,7 +3,7 @@ const bodyParser = require("body-parser");
 const express = require("express");
 
 const app = express();
-require("express-ws")(app);
+const expressWs = require("express-ws")(app);
 
 const javaScriptUtils = require("./app/utils/javascript-utils/javascript-utils");
 const runtimeVariables = require("./configs/runtime-variables");
@@ -44,6 +44,16 @@ app.post("/settings/periodicdata", (req, res) => {
   res.send({
     success: true,
     currentSettings
+  });
+});
+
+app.get("/settings/disconnect", (req, res) => {
+  expressWs.getWss().clients.forEach(client => {
+    client.close();
+  });
+
+  res.json({
+    success: true
   });
 });
 

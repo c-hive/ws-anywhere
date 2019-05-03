@@ -82,6 +82,7 @@ function getErrorSpanElement(errorSpanId) {
   return errorSpan;
 }
 
+// value !== null -> `typeof null` returns "object".
 function isObject(value) {
   return typeof value === "object" && value !== null;
 }
@@ -189,7 +190,7 @@ function postPerRequestSettings() {
       method: "POST",
       body: dummyData
     })
-      .then(res => res.json())
+      .then(response => response.json())
       .then(parsedResponse => {
         if (parsedResponse.success) {
           displaySuccessImg(elementIds.perRequest);
@@ -228,7 +229,7 @@ function postPeriodicSettings() {
       method: "POST",
       body: JSON.stringify(data)
     })
-      .then(res => res.json())
+      .then(response => response.json())
       .then(parsedResponse => {
         if (parsedResponse.success) {
           displaySuccessImg(elementIds.periodic);
@@ -243,5 +244,21 @@ function postPeriodicSettings() {
     const errorMessage = "Invalid JSON format.";
 
     displayErrorElements(elementIds.periodic, errorMessage);
+  }
+}
+
+// eslint-disable-next-line no-unused-vars
+function disconnectAllClients() {
+  if (confirm("Disconnect all the clients?")) {
+    const postUrl = "settings/disconnect";
+
+    fetch(postUrl)
+      .then(response => response.json())
+      .then(parsedResponse => {
+        if (parsedResponse.success) {
+          // eslint-disable-next-line no-console
+          console.log("[Successfully disconnected the clients.]");
+        }
+      });
   }
 }

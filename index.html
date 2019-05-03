@@ -11,6 +11,10 @@
         <h2>Customizable WebSocket test server</h2>
         <p>WebSocket connections can only be established on the index route.</p>
         <p>The objects are serialized as the WebSocket API doens't support sending raw objects. As a result, the received dummy data in the client side is stringified by <i>JSON.stringify()</i>.</p>
+        <div>
+            <p>The button below disconnects all the clients from the server. Please use it only in the case of testing purposeful stuff instead of trolling. :)</p>
+            <button type="button" onclick="disconnectAllClients()">Disconnect clients</button>
+        </div>
         <h3>How to use?</h3>
         <p>There are two different ways to use the server:
 
