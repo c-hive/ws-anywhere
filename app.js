@@ -47,7 +47,7 @@ app.post("/settings/periodic", (req, res) => {
   });
 });
 
-app.get("/settings/disconnect", (req, res) => {
+app.get("/disconnect", (req, res) => {
   expressWs.getWss().clients.forEach(client => {
     client.close();
   });

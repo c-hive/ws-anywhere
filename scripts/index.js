@@ -254,7 +254,7 @@ function submitPeriodicSettings() {
 // eslint-disable-next-line no-unused-vars
 function disconnectAllClients() {
   if (confirm("Disconnect all the clients?")) {
-    const postUrl = "settings/disconnect";
+    const postUrl = "disconnect";
 
     fetch(postUrl)
       .then(response => response.json())
