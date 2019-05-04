@@ -3,11 +3,11 @@ const javaScriptUtils = require("../utils/javascript-utils/javascript-utils");
 class Settings {
   constructor() {
     this.onEvent = {
-      dummyResponseMessage: {}
+      message: {}
     };
 
     this.periodic = {
-      dummyResponseMessage: {},
+      message: {},
       intervalInMilliseconds: 0
     };
   }
@@ -20,17 +20,13 @@ class Settings {
 
   setOnEventSettings(onEventResponseMessage) {
     this.onEvent = {
-      dummyResponseMessage: javaScriptUtils.deepCopyObject(
-        onEventResponseMessage
-      )
+      message: javaScriptUtils.deepCopyObject(onEventResponseMessage)
     };
   }
 
   setPeriodicSettings(periodicSettings) {
     this.periodic = {
-      dummyResponseMessage: javaScriptUtils.deepCopyObject(
-        periodicSettings.responseMessage
-      ),
+      message: javaScriptUtils.deepCopyObject(periodicSettings.responseMessage),
       intervalInMilliseconds: this.convertSecondsToMilliseconds(
         Number(periodicSettings.periodInSeconds)
       )

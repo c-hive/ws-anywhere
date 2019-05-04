@@ -156,19 +156,19 @@ function displayErrorElements(elementIdsGroup, errorMessage) {
 }
 
 function setInputValues(data) {
-  if (objectIsNotEmpty(data.currentSettings.onEvent.dummyResponseMessage)) {
+  if (objectIsNotEmpty(data.currentSettings.onEvent.message)) {
     document.getElementById("onEventResponseMessage").value = JSON.stringify(
-      data.currentSettings.onEvent.dummyResponseMessage,
+      data.currentSettings.onEvent.message,
       undefined,
       2
     );
   }
 
-  if (objectIsNotEmpty(data.currentSettings.periodic.dummyResponseMessage)) {
+  if (objectIsNotEmpty(data.currentSettings.periodic.message)) {
     const oneSecondInMilliseconds = 1000;
 
     document.getElementById("periodicResponseMessage").value =
-      data.currentSettings.periodic.dummyResponseMessage;
+      data.currentSettings.periodic.message;
     document.getElementById("periodInSeconds").value =
       data.currentSettings.periodic.intervalInMilliseconds /
       oneSecondInMilliseconds;

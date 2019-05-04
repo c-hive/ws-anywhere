@@ -59,25 +59,18 @@ app.get("/disconnect", (req, res) => {
 
 app.ws("/", ws => {
   ws.on("message", () => {
-    if (
-      javaScriptUtils.objectIsNotEmpty(settings.onEvent.dummyResponseMessage)
-    ) {
-      ws.send(JSON.stringify(settings.onEvent.dummyResponseMessage));
+    if (javaScriptUtils.objectIsNotEmpty(settings.onEvent.message)) {
+      ws.send(JSON.stringify(settings.onEvent.message));
     }
   });
 
-  if (
-    javaScriptUtils.objectIsNotEmpty(settings.periodic.dummyResponseMessage)
-  ) {
+  if (javaScriptUtils.objectIsNotEmpty(settings.periodic.message)) {
     setInterval(() => {
       // https://github.com/websockets/ws/issues/793
       const isConnectionOpen = ws.readyState === ws.OPEN;
 
       if (isConnectionOpen) {
-        ws.send(JSON.stringify(settings.periodic.dummyResponseMessage));
-      } else {
-        // It might not be necessary, but good to close the connection safely.
-        ws.close();
+        ws.send(JSON.stringify(settings.periodic.message));
       }
     }, settings.periodic.intervalInMilliseconds);
   }
