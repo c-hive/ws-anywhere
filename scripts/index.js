@@ -218,6 +218,8 @@ function submitPeriodicSettings() {
   const periodInSeconds = document.getElementById("periodInSeconds").value;
 
   if (isInputDataValid(periodicResponseMessage)) {
+    document.getElementById("startBtn").disabled = true;
+
     const postUrl = "/settings/periodic";
 
     const data = {
@@ -265,4 +267,30 @@ function disconnectAllClients() {
         }
       });
   }
+}
+
+// eslint-disable-next-line no-unused-vars
+function startSendingPeriodicMessage() {
+  document.getElementById("startBtn").disabled = true;
+
+  fetch("/settings/periodic/start")
+    .then(response => response.json())
+    .then(parsedResponse => {
+      if (parsedResponse.success) {
+        document.getElementById("stopBtn").disabled = false;
+      }
+    });
+}
+
+// eslint-disable-next-line no-unused-vars
+function stopSendingPeriodicMessage() {
+  document.getElementById("stopBtn").disabled = true;
+
+  fetch("/settings/periodic/stop")
+    .then(response => response.json())
+    .then(parsedResponse => {
+      if (parsedResponse.success) {
+        document.getElementById("startBtn").disabled = false;
+      }
+    });
 }
