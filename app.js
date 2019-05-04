@@ -38,7 +38,7 @@ app.get("/settings/current", (req, res) => {
   });
 });
 
-app.post("/settings/onevent", (req, res) => {
+app.post("/settings/onevent/save", (req, res) => {
   settings.setOnEventSettings(req.body);
 
   const currentSettings = settings.getCurrentSettings();
@@ -49,7 +49,7 @@ app.post("/settings/onevent", (req, res) => {
   });
 });
 
-app.post("/settings/periodic", (req, res) => {
+app.post("/settings/periodic/save", (req, res) => {
   settings.setPeriodicSettings(req.body);
 
   const currentSettings = settings.getCurrentSettings();

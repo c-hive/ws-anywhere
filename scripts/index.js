@@ -82,6 +82,10 @@ function getErrorSpanElement(errorSpanId) {
   return errorSpan;
 }
 
+function isDefined(value) {
+  return typeof value !== "undefined";
+}
+
 // value !== null -> `typeof null` returns "object".
 function isObject(value) {
   return typeof value === "object" && value !== null;
@@ -155,6 +159,16 @@ function displayErrorElements(elementIdsGroup, errorMessage) {
   }
 }
 
+function updatePeriodicActionButtonsDisabledProperty(btnStatuses) {
+  if (isDefined(btnStatuses.start)) {
+    document.getElementById("startBtn").disabled = btnStatuses.start;
+  }
+
+  if (isDefined(btnStatuses.stop)) {
+    document.getElementById("stopBtn").disabled = btnStatuses.stop;
+  }
+}
+
 function setInputValues(data) {
   if (objectIsNotEmpty(data.currentSettings.onEvent.message)) {
     document.getElementById("onEventResponseMessage").value = JSON.stringify(
@@ -172,6 +186,11 @@ function setInputValues(data) {
     document.getElementById("periodInSeconds").value =
       data.currentSettings.periodic.intervalInMilliseconds /
       oneSecondInMilliseconds;
+  } else {
+    updatePeriodicActionButtonsDisabledProperty({
+      start: true,
+      stop: true
+    });
   }
 }
 
@@ -182,7 +201,7 @@ function submitOnEventSettings() {
   ).value;
 
   if (isInputDataValid(onEventResponseMessage)) {
-    const postUrl = "/settings/onevent";
+    const postUrl = "/settings/onevent/save";
 
     fetch(postUrl, {
       headers: {
@@ -218,9 +237,12 @@ function submitPeriodicSettings() {
   const periodInSeconds = document.getElementById("periodInSeconds").value;
 
   if (isInputDataValid(periodicResponseMessage)) {
-    document.getElementById("startBtn").disabled = true;
+    updatePeriodicActionButtonsDisabledProperty({
+      start: true,
+      stop: false
+    });
 
-    const postUrl = "/settings/periodic";
+    const postUrl = "/settings/periodic/save";
 
     const data = {
       responseMessage: periodicResponseMessage,
@@ -271,26 +293,34 @@ function disconnectAllClients() {
 
 // eslint-disable-next-line no-unused-vars
 function startSendingPeriodicMessage() {
-  document.getElementById("startBtn").disabled = true;
+  updatePeriodicActionButtonsDisabledProperty({
+    start: true
+  });
 
   fetch("/settings/periodic/start")
     .then(response => response.json())
     .then(parsedResponse => {
       if (parsedResponse.success) {
-        document.getElementById("stopBtn").disabled = false;
+        updatePeriodicActionButtonsDisabledProperty({
+          stop: false
+        });
       }
     });
 }
 
 // eslint-disable-next-line no-unused-vars
 function stopSendingPeriodicMessage() {
-  document.getElementById("stopBtn").disabled = true;
+  updatePeriodicActionButtonsDisabledProperty({
+    stop: true
+  });
 
   fetch("/settings/periodic/stop")
     .then(response => response.json())
     .then(parsedResponse => {
       if (parsedResponse.success) {
-        document.getElementById("startBtn").disabled = false;
+        updatePeriodicActionButtonsDisabledProperty({
+          start: false
+        });
       }
     });
 }
