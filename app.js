@@ -60,9 +60,9 @@ app.get("/disconnect", (req, res) => {
 app.ws("/", ws => {
   ws.on("message", () => {
     if (
-      javaScriptUtils.objectIsNotEmpty(settings.perRequest.dummyResponseMessage)
+      javaScriptUtils.objectIsNotEmpty(settings.onEvent.dummyResponseMessage)
     ) {
-      ws.send(JSON.stringify(settings.perRequest.dummyResponseMessage));
+      ws.send(JSON.stringify(settings.onEvent.dummyResponseMessage));
     }
   });
 
