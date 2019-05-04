@@ -33,7 +33,7 @@ const startSendingPeriodicMessage = ws => {
 app.get("/settings/current", (req, res) => {
   const currentSettings = settings.getCurrentSettings();
 
-  res.json({
+  res.status(200).json({
     currentSettings
   });
 });
@@ -43,7 +43,7 @@ app.post("/settings/onevent/save", (req, res) => {
 
   const currentSettings = settings.getCurrentSettings();
 
-  res.json({
+  res.status(200).json({
     success: true,
     currentSettings
   });
@@ -54,7 +54,7 @@ app.post("/settings/periodic/save", (req, res) => {
 
   const currentSettings = settings.getCurrentSettings();
 
-  res.send({
+  res.status(200).send({
     success: true,
     currentSettings
   });
@@ -65,7 +65,7 @@ app.get("/settings/periodic/start", (req, res) => {
     startSendingPeriodicMessage(client);
   });
 
-  res.json({
+  res.status(200).json({
     success: true
   });
 });
@@ -73,7 +73,7 @@ app.get("/settings/periodic/start", (req, res) => {
 app.get("/settings/periodic/stop", (req, res) => {
   clearInterval(timer);
 
-  res.json({
+  res.status(200).json({
     success: true
   });
 });
@@ -83,7 +83,7 @@ app.get("/disconnect", (req, res) => {
     client.close();
   });
 
-  res.json({
+  res.status(200).json({
     success: true
   });
 });
