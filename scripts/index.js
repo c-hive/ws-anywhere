@@ -149,13 +149,10 @@ function displayErrorElements(elementIdsGroup, errorMessage) {
   elementsGroup.errorImg.style.display = "block";
 
   hideElements([elementsGroup.successImg]);
-  hideElementAfterMsElapsed(elementsGroup.errorImg, 2500);
 
   if (errorMessage) {
     elementsGroup.errorSpan.style.display = "block";
     elementsGroup.errorSpan.innerText = errorMessage;
-
-    hideElementAfterMsElapsed(elementsGroup.errorSpan, 2500);
   }
 }
 
