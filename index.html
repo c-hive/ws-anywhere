@@ -24,7 +24,7 @@
             <h4>1. PER SEND EVENT</h4>
             <p>This is evoked whenever a <i>send</i> event has been sent towards the server.</p>
             <textarea id="onEventResponseMessage" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
-            <div id="onEventSubmitBar" class="submitBar">
+            <div id="onEventSubmitBar" class="flexBar">
                 <button type="button" onclick="submitOnEventSettings()">Submit</button>
             </div>
         </div>
@@ -34,9 +34,22 @@
             <p>The period of the intervals is customizable. As a side note, this occurs immediately after connecting to the server - depending on the interval you set.</p>
             <textarea id="periodicResponseMessage" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
             <input id="periodInSeconds" type="number" style="width: 150px;" placeholder="Period in seconds" min="1" value="1" />
-            <div id="periodicSubmitBar" class="submitBar">
+            <div id="periodicSubmitBar" class="flexBar">
                 <button type="button" onclick="submitPeriodicSettings()">Submit</button>
             </div>
+            <div class="flexBar">
+                <button type="button" onclick="start()">Start</button>
+                <button type="button" onclick="stop()">Stop</button>
+            </div>
         </div>
+
+        <script>
+            function start() {
+                fetch("/actions/start");
+            }
+            function stop() {
+                fetch("/actions/stop");
+            }
+        </script>
     </body>
 </html>

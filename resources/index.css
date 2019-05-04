@@ -19,7 +19,7 @@ button {
     outline: none;
 }
 
-.submitBar {
+.flexBar {
     display: flex;
     align-items: center;
     justify-content: center;

@@ -182,7 +182,7 @@ function submitOnEventSettings() {
   ).value;
 
   if (isInputDataValid(onEventResponseMessage)) {
-    const postUrl = "settings/onevent";
+    const postUrl = "/settings/onevent";
 
     fetch(postUrl, {
       headers: {
@@ -218,7 +218,7 @@ function submitPeriodicSettings() {
   const periodInSeconds = document.getElementById("periodInSeconds").value;
 
   if (isInputDataValid(periodicResponseMessage)) {
-    const postUrl = "settings/periodic";
+    const postUrl = "/settings/periodic";
 
     const data = {
       responseMessage: periodicResponseMessage,
@@ -254,7 +254,7 @@ function submitPeriodicSettings() {
 // eslint-disable-next-line no-unused-vars
 function disconnectAllClients() {
   if (confirm("Disconnect all the clients?")) {
-    const postUrl = "disconnect";
+    const postUrl = "/disconnect";
 
     fetch(postUrl)
       .then(response => response.json())

@@ -47,10 +47,42 @@ app.post("/settings/periodic", (req, res) => {
   });
 });
 
+// OK
 app.get("/disconnect", (req, res) => {
   expressWs.getWss().clients.forEach(client => {
     client.close();
   });
+
+  res.json({
+    success: true
+  });
+});
+
+let timer;
+
+const startSendingPeriodicMessage = ws => {
+  timer = setInterval(() => {
+    // https://github.com/websockets/ws/issues/793
+    const isConnectionOpen = ws.readyState === ws.OPEN;
+
+    if (isConnectionOpen) {
+      ws.send(JSON.stringify(settings.periodic.message));
+    }
+  }, settings.periodic.intervalInMilliseconds);
+};
+
+app.get("/actions/start", (req, res) => {
+  expressWs.getWss().clients.forEach(client => {
+    startSendingPeriodicMessage(client);
+  });
+
+  res.json({
+    success: true
+  });
+});
+
+app.get("/actions/stop", (req, res) => {
+  clearInterval(timer);
 
   res.json({
     success: true
@@ -65,14 +97,7 @@ app.ws("/", ws => {
   });
 
   if (javaScriptUtils.objectIsNotEmpty(settings.periodic.message)) {
-    setInterval(() => {
-      // https://github.com/websockets/ws/issues/793
-      const isConnectionOpen = ws.readyState === ws.OPEN;
-
-      if (isConnectionOpen) {
-        ws.send(JSON.stringify(settings.periodic.message));
-      }
-    }, settings.periodic.intervalInMilliseconds);
+    startSendingPeriodicMessage(ws);
   }
 });
 
