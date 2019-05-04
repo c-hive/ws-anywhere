@@ -1,0 +1,39 @@
+body {
+    text-align: center;
+}
+
+input, textarea {
+    display: block;
+    margin: 10px auto;
+    padding: 10px 15px;
+}
+
+input[name="periodInSeconds"] {
+    padding: 10px 5px;
+}
+
+button {
+    margin: 5px;
+    padding: 5px 10px;
+    background: none;
+    outline: none;
+}
+
+.submitBar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.statusImg {
+    width: 25px;
+    height: 25px;
+    display: none;
+}
+
+.errorMsg {
+    font-size: 12px;
+    margin-left: 5px;
+    font-weight: bold;
+    display: none;
+}

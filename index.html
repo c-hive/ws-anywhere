@@ -2,23 +2,41 @@
     <head>
         <meta charset="UTF-8">
         <title>ws-anywhere</title>
-        <style>
-            body {
-                text-align: center;
-            }
-        </style>
+
+        <link rel="stylesheet" type="text/css" href="index.css" />
+        <script src="index.js" type="text/javascript"></script>
     </head>
     <body>
         <h1>ws-anywhere</h1>
-        <h3>Customizable WebSocket test server</h3>
+        <h2>Customizable WebSocket test server</h2>
+        <p>WebSocket connections can only be established on the index route.</p>
+        <p>The objects are serialized as the WebSocket API doens't support sending raw objects. As a result, the received dummy data in the client side is stringified by <i>JSON.stringify()</i>.</p>
+
         <div>
-            <p>Whenever the server receives any data, it will response with the JSON you set below.</p>
-            <textarea rows="10" cols="80" placeholder="JSON response"></textarea>
+            <p>The button below disconnects all the clients from the server. Please use it only in the case of testing purposeful stuff instead of trolling. :)</p>
+            <button type="button" onclick="disconnectAllClients()">Disconnect clients</button>
         </div>
+
+        <h3>How to use?</h3>
+        <p>There are two different ways to use the server:
+        
         <div>
-            <p>Send the desired data back to the connected clients periodically.</p>
-            <textarea rows="10" cols="80" placeholder="JSON response"></textarea><br />
-            <input type="number" style="width: 150px;" placeholder="Period in seconds" min="1" max="5">
+            <h4>1. PER SEND EVENT</h4>
+            <p>This is evoked whenever a <i>send</i> event has been sent towards the server.</p>
+            <textarea id="onEventResponseMessage" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
+            <div id="onEventSubmitBar" class="submitBar">
+                <button type="button" onclick="submitOnEventSettings()">Submit</button>
+            </div>
+        </div>
+
+        <div>
+            <h4>2. PERIODIC</h4>
+            <p>The period of the intervals is customizable. As a side note, this occurs immediately after connecting to the server - depending on the interval you set.</p>
+            <textarea id="periodicResponseMessage" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
+            <input id="periodInSeconds" type="number" style="width: 150px;" placeholder="Period in seconds" min="1" value="1" />
+            <div id="periodicSubmitBar" class="submitBar">
+                <button type="button" onclick="submitPeriodicSettings()">Submit</button>
+            </div>
         </div>
     </body>
 </html>
