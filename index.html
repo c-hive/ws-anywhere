@@ -25,14 +25,14 @@
             <p>This is evoked whenever a <i>send</i> event has been sent towards the server.</p>
             <textarea id="onEventResponseMessage" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
             <div id="onEventSubmitBar" class="flexBar">
-                <button type="button" onclick="submitOnEventSettings()">Submit</button>
+                <button type="button" onclick="submitOnEventMessage()">Submit</button>
             </div>
         </div>
 
         <div>
             <h4>2. PERIODIC</h4>
             <p>The period of the intervals is customizable. As a side note, this occurs immediately after connecting to the server - depending on the interval you set.</p>
-            <textarea id="periodicResponseMessage" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
+            <textarea onchange="handlePeriodicMessageChange()" onkeyup="handlePeriodicMessageChange()" id="periodicResponseMessage" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
             <input id="periodInSeconds" type="number" style="width: 150px;" placeholder="Period in seconds" min="1" value="1" />
             <div id="periodicSubmitBar" class="flexBar">
                 <button type="button" onclick="submitPeriodicSettings()">Submit</button>

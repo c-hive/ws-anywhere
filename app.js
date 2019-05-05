@@ -5,8 +5,8 @@ const express = require("express");
 const app = express();
 const expressWs = require("express-ws")(app);
 
-const javaScriptUtils = require("./app/utils/javascript-utils/javascript-utils");
 const runtimeVariables = require("./configs/runtime-variables");
+const javaScriptUtils = require("./app/utils/javascript-utils/javascript-utils");
 const Settings = require("./app/settings/settings");
 
 const settings = new Settings();
@@ -24,7 +24,10 @@ const startSendingPeriodicMessage = ws => {
     // https://github.com/websockets/ws/issues/793
     const isConnectionOpen = ws.readyState === ws.OPEN;
 
-    if (isConnectionOpen) {
+    if (
+      isConnectionOpen &&
+      javaScriptUtils.isDefined(settings.periodic.message)
+    ) {
       ws.send(JSON.stringify(settings.periodic.message));
     }
   }, settings.periodic.intervalInMilliseconds);
@@ -90,14 +93,10 @@ app.get("/disconnect", (req, res) => {
 
 app.ws("/", ws => {
   ws.on("message", () => {
-    if (javaScriptUtils.objectIsNotEmpty(settings.onEvent.message)) {
-      ws.send(JSON.stringify(settings.onEvent.message));
-    }
+    ws.send(JSON.stringify(settings.onEvent.message));
   });
 
-  if (javaScriptUtils.objectIsNotEmpty(settings.periodic.message)) {
-    startSendingPeriodicMessage(ws);
-  }
+  startSendingPeriodicMessage(ws);
 });
 
 app

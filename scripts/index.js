@@ -12,12 +12,12 @@ const elementIds = {
 };
 
 window.onload = function() {
-  const getUrl = "settings/current";
+  const getUrl = "/settings/current";
 
   fetch(getUrl)
-    .then(res => res.json())
-    .then(parsedResponse => {
-      setInputValues(parsedResponse);
+    .then(currentSettings => currentSettings.json())
+    .then(parsedCurrentSettings => {
+      setInputValues(parsedCurrentSettings);
     });
 
   createSubmitBarElements();
@@ -83,7 +83,7 @@ function getErrorSpanElement(errorSpanId) {
 }
 
 function isDefined(value) {
-  return typeof value !== "undefined";
+  return typeof value !== "undefined" && value !== null;
 }
 
 // value !== null -> `typeof null` returns "object".
@@ -91,11 +91,7 @@ function isObject(value) {
   return typeof value === "object" && value !== null;
 }
 
-function objectIsNotEmpty(object) {
-  return Object.keys(object).length !== 0;
-}
-
-function isInputDataValid(data) {
+function isJson(data) {
   try {
     // Because <textarea /> returns a string by default.
     const parsedData = JSON.parse(data);
@@ -166,8 +162,15 @@ function updatePeriodicActionButtonsDisabledProperty(btnStatuses) {
   }
 }
 
+function peridocActionButtonsAreDisabled() {
+  return (
+    document.getElementById("startBtn").disabled &&
+    document.getElementById("stopBtn").disabled
+  );
+}
+
 function setInputValues(data) {
-  if (objectIsNotEmpty(data.currentSettings.onEvent.message)) {
+  if (isDefined(data.currentSettings.onEvent.message)) {
     document.getElementById("onEventResponseMessage").value = JSON.stringify(
       data.currentSettings.onEvent.message,
       undefined,
@@ -175,7 +178,7 @@ function setInputValues(data) {
     );
   }
 
-  if (objectIsNotEmpty(data.currentSettings.periodic.message)) {
+  if (isDefined(data.currentSettings.periodic.message)) {
     const oneSecondInMilliseconds = 1000;
 
     document.getElementById("periodicResponseMessage").value =
@@ -183,92 +186,16 @@ function setInputValues(data) {
     document.getElementById("periodInSeconds").value =
       data.currentSettings.periodic.intervalInMilliseconds /
       oneSecondInMilliseconds;
+
+    updatePeriodicActionButtonsDisabledProperty({
+      start: false,
+      stop: true
+    });
   } else {
     updatePeriodicActionButtonsDisabledProperty({
       start: true,
       stop: true
     });
-  }
-}
-
-// eslint-disable-next-line no-unused-vars
-function submitOnEventSettings() {
-  const onEventResponseMessage = document.getElementById(
-    "onEventResponseMessage"
-  ).value;
-
-  if (isInputDataValid(onEventResponseMessage)) {
-    const postUrl = "/settings/onevent/save";
-
-    fetch(postUrl, {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      method: "POST",
-      body: onEventResponseMessage
-    })
-      .then(response => response.json())
-      .then(parsedResponse => {
-        if (parsedResponse.success) {
-          displaySuccessImg(elementIds.onEvent);
-
-          setInputValues(parsedResponse);
-        }
-      })
-      .catch(() => {
-        displayErrorElements(elementIds.onEvent);
-      });
-  } else {
-    const errorMessage = "Invalid JSON format.";
-
-    displayErrorElements(elementIds.onEvent, errorMessage);
-  }
-}
-
-// eslint-disable-next-line no-unused-vars
-function submitPeriodicSettings() {
-  const periodicResponseMessage = document.getElementById(
-    "periodicResponseMessage"
-  ).value;
-  const periodInSeconds = document.getElementById("periodInSeconds").value;
-
-  if (isInputDataValid(periodicResponseMessage)) {
-    updatePeriodicActionButtonsDisabledProperty({
-      start: true,
-      stop: false
-    });
-
-    const postUrl = "/settings/periodic/save";
-
-    const data = {
-      responseMessage: periodicResponseMessage,
-      periodInSeconds
-    };
-
-    fetch(postUrl, {
-      headers: {
-        Accept: "application/json",
-        "Content-Type": "application/json"
-      },
-      method: "POST",
-      body: JSON.stringify(data)
-    })
-      .then(response => response.json())
-      .then(parsedResponse => {
-        if (parsedResponse.success) {
-          displaySuccessImg(elementIds.periodic);
-
-          setInputValues(parsedResponse);
-        }
-      })
-      .catch(() => {
-        displayErrorElements(elementIds.periodic);
-      });
-  } else {
-    const errorMessage = "Invalid JSON format.";
-
-    displayErrorElements(elementIds.periodic, errorMessage);
   }
 }
 
@@ -288,6 +215,109 @@ function disconnectAllClients() {
   }
 }
 
+function getPeriodicMessageSettings() {
+  const message = document.getElementById("periodicResponseMessage").value;
+
+  const periodInSeconds = document.getElementById("periodInSeconds").value;
+
+  return {
+    message,
+    periodInSeconds
+  };
+}
+
+function getOnEventMessage() {
+  return document.getElementById("onEventResponseMessage").value;
+}
+
+function checkIfOnEventMessageIsValid() {
+  const onEventResponseMessage = getOnEventMessage();
+
+  if (isJson(onEventResponseMessage)) {
+    return true;
+  }
+
+  return false;
+}
+
+function checkIfPeriodicMessageIsValid() {
+  const periodicMessageSettings = getPeriodicMessageSettings();
+
+  if (isJson(periodicMessageSettings.message)) {
+    return true;
+  }
+
+  return false;
+}
+
+// eslint-disable-next-line no-unused-vars
+function submitOnEventMessage() {
+  const onEventPostMessage = getOnEventMessage();
+
+  if (checkIfOnEventMessageIsValid()) {
+    const postUrl = "/settings/onevent/save";
+
+    fetch(postUrl, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: onEventPostMessage
+    })
+      .then(response => response.json())
+      .then(parsedResponse => {
+        if (parsedResponse.success) {
+          displaySuccessImg(elementIds.onEvent);
+        }
+      })
+      .catch(() => {
+        displayErrorElements(elementIds.onEvent);
+      });
+  } else {
+    const errorMessage = "Invalid JSON format.";
+
+    displayErrorElements(elementIds.onEvent, errorMessage);
+  }
+}
+
+// eslint-disable-next-line no-unused-vars
+function submitPeriodicSettings() {
+  if (checkIfPeriodicMessageIsValid()) {
+    const perodicMessageSettings = getPeriodicMessageSettings();
+
+    const postUrl = "/settings/periodic/save";
+
+    fetch(postUrl, {
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: JSON.stringify(perodicMessageSettings)
+    })
+      .then(response => response.json())
+      .then(parsedResponse => {
+        if (parsedResponse.success) {
+          displaySuccessImg(elementIds.periodic);
+
+          if (peridocActionButtonsAreDisabled()) {
+            updatePeriodicActionButtonsDisabledProperty({
+              start: false
+            });
+          }
+        }
+      })
+      .catch(() => {
+        displayErrorElements(elementIds.periodic);
+      });
+  } else {
+    const errorMessage = "Invalid JSON format.";
+
+    displayErrorElements(elementIds.periodic, errorMessage);
+  }
+}
+
 // eslint-disable-next-line no-unused-vars
 function startSendingPeriodicMessage() {
   updatePeriodicActionButtonsDisabledProperty({
@@ -302,6 +332,12 @@ function startSendingPeriodicMessage() {
           stop: false
         });
       }
+    })
+    .catch(() => {
+      updatePeriodicActionButtonsDisabledProperty({
+        start: false,
+        stop: true
+      });
     });
 }
 
@@ -319,5 +355,11 @@ function stopSendingPeriodicMessage() {
           start: false
         });
       }
+    })
+    .catch(() => {
+      updatePeriodicActionButtonsDisabledProperty({
+        start: true,
+        stop: false
+      });
     });
 }
