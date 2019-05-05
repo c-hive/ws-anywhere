@@ -10,6 +10,8 @@ class Settings {
       message: null,
       intervalInMilliseconds: 0
     };
+
+    this.isPeriodicMessageSendingActive = false;
   }
 
   convertSecondsToMilliseconds(seconds) {
@@ -31,6 +33,10 @@ class Settings {
         Number(periodicSettings.periodInSeconds)
       )
     };
+  }
+
+  setIsPeriodicMessageSendingActive(value) {
+    this.isPeriodicMessageSendingActive = value;
   }
 
   getCurrentSettings() {

@@ -20,17 +20,16 @@ app.use(express.static(path.join(__dirname, "scripts")));
 let timer;
 
 const startSendingPeriodicMessage = ws => {
-  timer = setInterval(() => {
-    // https://github.com/websockets/ws/issues/793
-    const isConnectionOpen = ws.readyState === ws.OPEN;
+  if (javaScriptUtils.isDefined(settings.periodic.message)) {
+    timer = setInterval(() => {
+      // https://github.com/websockets/ws/issues/793
+      const isConnectionOpen = ws.readyState === ws.OPEN;
 
-    if (
-      isConnectionOpen &&
-      javaScriptUtils.isDefined(settings.periodic.message)
-    ) {
-      ws.send(JSON.stringify(settings.periodic.message));
-    }
-  }, settings.periodic.intervalInMilliseconds);
+      if (isConnectionOpen) {
+        ws.send(JSON.stringify(settings.periodic.message));
+      }
+    }, settings.periodic.intervalInMilliseconds);
+  }
 };
 
 app.get("/settings/current", (req, res) => {
@@ -64,6 +63,8 @@ app.post("/settings/periodic/save", (req, res) => {
 });
 
 app.get("/settings/periodic/start", (req, res) => {
+  settings.setIsPeriodicMessageSendingActive(true);
+
   expressWs.getWss().clients.forEach(client => {
     startSendingPeriodicMessage(client);
   });
@@ -74,6 +75,8 @@ app.get("/settings/periodic/start", (req, res) => {
 });
 
 app.get("/settings/periodic/stop", (req, res) => {
+  settings.setIsPeriodicMessageSendingActive(false);
+
   clearInterval(timer);
 
   res.status(200).json({
@@ -96,7 +99,9 @@ app.ws("/", ws => {
     ws.send(JSON.stringify(settings.onEvent.message));
   });
 
-  startSendingPeriodicMessage(ws);
+  if (settings.isPeriodicMessageSendingActive) {
+    startSendingPeriodicMessage(ws);
+  }
 });
 
 app
