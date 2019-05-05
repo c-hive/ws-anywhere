@@ -32,7 +32,7 @@
         <div>
             <h4>2. PERIODIC</h4>
             <p>The period of the intervals is customizable. As a side note, this occurs immediately after connecting to the server - depending on the interval you set.</p>
-            <textarea onchange="handlePeriodicMessageChange()" onkeyup="handlePeriodicMessageChange()" id="periodicResponseMessage" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
+            <textarea id="periodicResponseMessage" rows="10" cols="80" placeholder="Place the desired dummy response data here."></textarea>
             <input id="periodInSeconds" type="number" style="width: 150px;" placeholder="Period in seconds" min="1" value="1" />
             <div id="periodicSubmitBar" class="flexBar">
                 <button type="button" onclick="submitPeriodicSettings()">Submit</button>
