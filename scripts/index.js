@@ -30,8 +30,10 @@ window.onload = function() {
 
 function createFeedbackElements() {
   Object.keys(elementIds).map(itemId => {
+    const elementIdsGroup = elementIds[itemId];
+
     const preparedFeedbackElements = getPreparedFeedbackElements(
-      elementIds[itemId]
+      elementIdsGroup
     );
 
     appendFeedbackElementsToItem(itemId, preparedFeedbackElements);
