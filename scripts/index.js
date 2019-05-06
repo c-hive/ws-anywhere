@@ -8,6 +8,11 @@ const elementIds = {
     successImg: "periodicSuccessImg",
     errorImg: "periodicErrorImg",
     errorSpan: "periodicErrorSpan"
+  },
+  disconnect: {
+    successImg: "disconnectSuccessImg",
+    errorImg: "disconnectErrorImg",
+    errorSpan: "disconnectErrorSpan"
   }
 };
 
@@ -20,26 +25,30 @@ window.onload = function() {
       setInputValues(parsedCurrentSettings);
     });
 
-  createSubmitBarElements();
+  createFeedbackElements();
 };
 
-function createSubmitBarElements() {
-  const onEventSubmitBar = document.getElementById("onEventSubmitBar");
-  const periodicSubmitBar = document.getElementById("periodicSubmitBar");
+function createFeedbackElements() {
+  Object.keys(elementIds).map(itemId => {
+    const elementIdsGroup = elementIds[itemId];
 
-  const onEventHTMLElements = getPreparedHTMLElements(elementIds.onEvent);
-  const periodicHTMLElements = getPreparedHTMLElements(elementIds.periodic);
+    const preparedFeedbackElements = getPreparedFeedbackElements(
+      elementIdsGroup
+    );
 
-  onEventSubmitBar.appendChild(onEventHTMLElements.successImg);
-  onEventSubmitBar.appendChild(onEventHTMLElements.errorImg);
-  onEventSubmitBar.appendChild(onEventHTMLElements.errorSpan);
-
-  periodicSubmitBar.appendChild(periodicHTMLElements.successImg);
-  periodicSubmitBar.appendChild(periodicHTMLElements.errorImg);
-  periodicSubmitBar.appendChild(periodicHTMLElements.errorSpan);
+    appendFeedbackElementsToItem(itemId, preparedFeedbackElements);
+  });
 }
 
-function getPreparedHTMLElements(elementIdsGroup) {
+function appendFeedbackElementsToItem(itemId, feedbackElements) {
+  const item = document.getElementById(itemId);
+
+  item.appendChild(feedbackElements.successImg);
+  item.appendChild(feedbackElements.errorImg);
+  item.appendChild(feedbackElements.errorSpan);
+}
+
+function getPreparedFeedbackElements(elementIdsGroup) {
   const successImg = getSuccessImgElement(elementIdsGroup.successImg);
   const errorImg = getErrorImgElement(elementIdsGroup.errorImg);
   const errorSpan = getErrorSpanElement(elementIdsGroup.errorSpan);
@@ -208,9 +217,11 @@ function disconnectAllClients() {
       .then(response => response.json())
       .then(parsedResponse => {
         if (parsedResponse.success) {
-          // eslint-disable-next-line no-console
-          console.log("[Successfully disconnected all the clients.]");
+          displaySuccessImg(elementIds.disconnect);
         }
+      })
+      .catch(() => {
+        displayErrorElements(elementIds.disconnect);
       });
   }
 }
