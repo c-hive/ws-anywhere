@@ -2,11 +2,11 @@ function deepCopyObject(object) {
   return JSON.parse(JSON.stringify(object));
 }
 
-function objectIsNotEmpty(object) {
-  return Object.keys(object).length !== 0;
+function isDefined(value) {
+  return typeof value !== "undefined" && value !== null;
 }
 
 module.exports = {
   deepCopyObject,
-  objectIsNotEmpty
+  isDefined
 };

@@ -12,12 +12,12 @@ const elementIds = {
 };
 
 window.onload = function() {
-  const getUrl = "settings/current";
+  const getUrl = "/settings/current";
 
   fetch(getUrl)
-    .then(res => res.json())
-    .then(parsedResponse => {
-      setInputValues(parsedResponse);
+    .then(currentSettings => currentSettings.json())
+    .then(parsedCurrentSettings => {
+      setInputValues(parsedCurrentSettings);
     });
 
   createSubmitBarElements();
@@ -82,16 +82,16 @@ function getErrorSpanElement(errorSpanId) {
   return errorSpan;
 }
 
+function isDefined(value) {
+  return typeof value !== "undefined" && value !== null;
+}
+
 // value !== null -> `typeof null` returns "object".
 function isObject(value) {
   return typeof value === "object" && value !== null;
 }
 
-function objectIsNotEmpty(object) {
-  return Object.keys(object).length !== 0;
-}
-
-function isInputDataValid(data) {
+function isJson(data) {
   try {
     // Because <textarea /> returns a string by default.
     const parsedData = JSON.parse(data);
@@ -145,18 +145,32 @@ function displayErrorElements(elementIdsGroup, errorMessage) {
   elementsGroup.errorImg.style.display = "block";
 
   hideElements([elementsGroup.successImg]);
-  hideElementAfterMsElapsed(elementsGroup.errorImg, 2500);
 
   if (errorMessage) {
     elementsGroup.errorSpan.style.display = "block";
     elementsGroup.errorSpan.innerText = errorMessage;
-
-    hideElementAfterMsElapsed(elementsGroup.errorSpan, 2500);
   }
 }
 
+function updatePeriodicActionButtonsDisabledProperty(btnStatuses) {
+  if (isDefined(btnStatuses.start)) {
+    document.getElementById("startBtn").disabled = btnStatuses.start;
+  }
+
+  if (isDefined(btnStatuses.stop)) {
+    document.getElementById("stopBtn").disabled = btnStatuses.stop;
+  }
+}
+
+function peridocActionButtonsAreDisabled() {
+  return (
+    document.getElementById("startBtn").disabled &&
+    document.getElementById("stopBtn").disabled
+  );
+}
+
 function setInputValues(data) {
-  if (objectIsNotEmpty(data.currentSettings.onEvent.message)) {
+  if (isDefined(data.currentSettings.onEvent.message)) {
     document.getElementById("onEventResponseMessage").value = JSON.stringify(
       data.currentSettings.onEvent.message,
       undefined,
@@ -164,7 +178,7 @@ function setInputValues(data) {
     );
   }
 
-  if (objectIsNotEmpty(data.currentSettings.periodic.message)) {
+  if (isDefined(data.currentSettings.periodic.message)) {
     const oneSecondInMilliseconds = 1000;
 
     document.getElementById("periodicResponseMessage").value =
@@ -172,17 +186,76 @@ function setInputValues(data) {
     document.getElementById("periodInSeconds").value =
       data.currentSettings.periodic.intervalInMilliseconds /
       oneSecondInMilliseconds;
+
+    updatePeriodicActionButtonsDisabledProperty({
+      start: false,
+      stop: true
+    });
+  } else {
+    updatePeriodicActionButtonsDisabledProperty({
+      start: true,
+      stop: true
+    });
   }
 }
 
 // eslint-disable-next-line no-unused-vars
-function submitOnEventSettings() {
-  const onEventResponseMessage = document.getElementById(
-    "onEventResponseMessage"
-  ).value;
+function disconnectAllClients() {
+  if (confirm("Disconnect all the clients?")) {
+    const postUrl = "/disconnect";
 
-  if (isInputDataValid(onEventResponseMessage)) {
-    const postUrl = "settings/onevent";
+    fetch(postUrl)
+      .then(response => response.json())
+      .then(parsedResponse => {
+        if (parsedResponse.success) {
+          // eslint-disable-next-line no-console
+          console.log("[Successfully disconnected all the clients.]");
+        }
+      });
+  }
+}
+
+function getPeriodicMessageSettings() {
+  const message = document.getElementById("periodicResponseMessage").value;
+
+  const periodInSeconds = document.getElementById("periodInSeconds").value;
+
+  return {
+    message,
+    periodInSeconds
+  };
+}
+
+function getOnEventMessage() {
+  return document.getElementById("onEventResponseMessage").value;
+}
+
+function checkIfOnEventMessageIsValid() {
+  const onEventResponseMessage = getOnEventMessage();
+
+  if (isJson(onEventResponseMessage)) {
+    return true;
+  }
+
+  return false;
+}
+
+function checkIfPeriodicMessageIsValid() {
+  const periodicMessageSettings = getPeriodicMessageSettings();
+
+  if (isJson(periodicMessageSettings.message)) {
+    return true;
+  }
+
+  return false;
+}
+
+// eslint-disable-next-line no-unused-vars
+function submitOnEventMessage() {
+  const onEventPostMessage = getOnEventMessage();
+
+  if (checkIfOnEventMessageIsValid()) {
+    const postUrl = "/settings/onevent/save";
 
     fetch(postUrl, {
       headers: {
@@ -190,14 +263,12 @@ function submitOnEventSettings() {
         "Content-Type": "application/json"
       },
       method: "POST",
-      body: onEventResponseMessage
+      body: onEventPostMessage
     })
       .then(response => response.json())
       .then(parsedResponse => {
         if (parsedResponse.success) {
           displaySuccessImg(elementIds.onEvent);
-
-          setInputValues(parsedResponse);
         }
       })
       .catch(() => {
@@ -212,18 +283,10 @@ function submitOnEventSettings() {
 
 // eslint-disable-next-line no-unused-vars
 function submitPeriodicSettings() {
-  const periodicResponseMessage = document.getElementById(
-    "periodicResponseMessage"
-  ).value;
-  const periodInSeconds = document.getElementById("periodInSeconds").value;
+  if (checkIfPeriodicMessageIsValid()) {
+    const perodicMessageSettings = getPeriodicMessageSettings();
 
-  if (isInputDataValid(periodicResponseMessage)) {
-    const postUrl = "settings/periodic";
-
-    const data = {
-      responseMessage: periodicResponseMessage,
-      periodInSeconds
-    };
+    const postUrl = "/settings/periodic/save";
 
     fetch(postUrl, {
       headers: {
@@ -231,14 +294,18 @@ function submitPeriodicSettings() {
         "Content-Type": "application/json"
       },
       method: "POST",
-      body: JSON.stringify(data)
+      body: JSON.stringify(perodicMessageSettings)
     })
       .then(response => response.json())
       .then(parsedResponse => {
         if (parsedResponse.success) {
           displaySuccessImg(elementIds.periodic);
 
-          setInputValues(parsedResponse);
+          if (peridocActionButtonsAreDisabled()) {
+            updatePeriodicActionButtonsDisabledProperty({
+              start: false
+            });
+          }
         }
       })
       .catch(() => {
@@ -252,17 +319,47 @@ function submitPeriodicSettings() {
 }
 
 // eslint-disable-next-line no-unused-vars
-function disconnectAllClients() {
-  if (confirm("Disconnect all the clients?")) {
-    const postUrl = "disconnect";
+function startSendingPeriodicMessage() {
+  updatePeriodicActionButtonsDisabledProperty({
+    start: true
+  });
 
-    fetch(postUrl)
-      .then(response => response.json())
-      .then(parsedResponse => {
-        if (parsedResponse.success) {
-          // eslint-disable-next-line no-console
-          console.log("[Successfully disconnected all the clients.]");
-        }
+  fetch("/settings/periodic/start")
+    .then(response => response.json())
+    .then(parsedResponse => {
+      if (parsedResponse.success) {
+        updatePeriodicActionButtonsDisabledProperty({
+          stop: false
+        });
+      }
+    })
+    .catch(() => {
+      updatePeriodicActionButtonsDisabledProperty({
+        start: false,
+        stop: true
       });
-  }
+    });
+}
+
+// eslint-disable-next-line no-unused-vars
+function stopSendingPeriodicMessage() {
+  updatePeriodicActionButtonsDisabledProperty({
+    stop: true
+  });
+
+  fetch("/settings/periodic/stop")
+    .then(response => response.json())
+    .then(parsedResponse => {
+      if (parsedResponse.success) {
+        updatePeriodicActionButtonsDisabledProperty({
+          start: false
+        });
+      }
+    })
+    .catch(() => {
+      updatePeriodicActionButtonsDisabledProperty({
+        start: true,
+        stop: false
+      });
+    });
 }
