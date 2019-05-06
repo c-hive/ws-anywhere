@@ -43,21 +43,13 @@ function appendFeedbackElementsToItem(itemId, feedbackElements) {
 
   item.appendChild(feedbackElements.successImg);
   item.appendChild(feedbackElements.errorImg);
-
-  if (isDefined(feedbackElements.errorSpan)) {
-    item.appendChild(feedbackElements.errorSpan);
-  }
+  item.appendChild(feedbackElements.errorSpan);
 }
 
 function getPreparedFeedbackElements(elementIdsGroup) {
   const successImg = getSuccessImgElement(elementIdsGroup.successImg);
   const errorImg = getErrorImgElement(elementIdsGroup.errorImg);
-
-  let errorSpan = null;
-
-  if (isDefined(elementIdsGroup.errorSpan)) {
-    errorSpan = getErrorSpanElement(elementIdsGroup.errorSpan);
-  }
+  const errorSpan = getErrorSpanElement(elementIdsGroup.errorSpan);
 
   return {
     successImg,
