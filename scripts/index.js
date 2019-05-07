@@ -197,8 +197,8 @@ function setInputValues(data) {
       oneSecondInMilliseconds;
 
     updatePeriodicActionButtonsDisabledProperty({
-      start: false,
-      stop: true
+      start: data.currentSettings.isPeriodicMessageSendingActive,
+      stop: !data.currentSettings.isPeriodicMessageSendingActive
     });
   } else {
     updatePeriodicActionButtonsDisabledProperty({
