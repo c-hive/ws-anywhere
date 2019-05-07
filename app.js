@@ -26,7 +26,7 @@ const startSendingPeriodicMessage = ws => {
       const isConnectionOpen = ws.readyState === ws.OPEN;
 
       if (isConnectionOpen) {
-        ws.send(JSON.stringify(settings.periodic.message));
+        ws.send(settings.periodic.message);
       }
     }, settings.periodic.intervalInMilliseconds);
   }
