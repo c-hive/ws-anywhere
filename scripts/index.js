@@ -263,9 +263,9 @@ function checkIfPeriodicMessageIsValid() {
 
 // eslint-disable-next-line no-unused-vars
 function submitOnEventMessage() {
-  const onEventPostMessage = getOnEventMessage();
-
   if (checkIfOnEventMessageIsValid()) {
+    const onEventPostMessage = getOnEventMessage();
+
     const postUrl = "/settings/onevent/save";
 
     fetch(postUrl, {
