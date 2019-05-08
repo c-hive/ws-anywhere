@@ -42,7 +42,8 @@ class Settings {
   getCurrentSettings() {
     return {
       onEvent: javaScriptUtils.deepCopyObject(this.onEvent),
-      periodic: javaScriptUtils.deepCopyObject(this.periodic)
+      periodic: javaScriptUtils.deepCopyObject(this.periodic),
+      isPeriodicMessageSendingActive: this.isPeriodicMessageSendingActive
     };
   }
 }

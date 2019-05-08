@@ -6,7 +6,6 @@ const app = express();
 const expressWs = require("express-ws")(app);
 
 const runtimeVariables = require("./configs/runtime-variables");
-const javaScriptUtils = require("./app/utils/javascript-utils/javascript-utils");
 const Settings = require("./app/settings/settings");
 
 const settings = new Settings();
@@ -20,16 +19,14 @@ app.use(express.static(path.join(__dirname, "scripts")));
 let timer;
 
 const startSendingPeriodicMessage = ws => {
-  if (javaScriptUtils.isDefined(settings.periodic.message)) {
-    timer = setInterval(() => {
-      // https://github.com/websockets/ws/issues/793
-      const isConnectionOpen = ws.readyState === ws.OPEN;
+  timer = setInterval(() => {
+    // https://github.com/websockets/ws/issues/793
+    const isConnectionOpen = ws.readyState === ws.OPEN;
 
-      if (isConnectionOpen) {
-        ws.send(JSON.stringify(settings.periodic.message));
-      }
-    }, settings.periodic.intervalInMilliseconds);
-  }
+    if (isConnectionOpen) {
+      ws.send(settings.periodic.message);
+    }
+  }, settings.periodic.intervalInMilliseconds);
 };
 
 app.get("/settings/current", (req, res) => {

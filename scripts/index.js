@@ -197,8 +197,8 @@ function setInputValues(data) {
       oneSecondInMilliseconds;
 
     updatePeriodicActionButtonsDisabledProperty({
-      start: false,
-      stop: true
+      start: data.currentSettings.isPeriodicMessageSendingActive,
+      stop: !data.currentSettings.isPeriodicMessageSendingActive
     });
   } else {
     updatePeriodicActionButtonsDisabledProperty({
@@ -263,9 +263,9 @@ function checkIfPeriodicMessageIsValid() {
 
 // eslint-disable-next-line no-unused-vars
 function submitOnEventMessage() {
-  const onEventPostMessage = getOnEventMessage();
-
   if (checkIfOnEventMessageIsValid()) {
+    const onEventPostMessage = getOnEventMessage();
+
     const postUrl = "/settings/onevent/save";
 
     fetch(postUrl, {
