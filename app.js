@@ -6,9 +6,7 @@ const app = express();
 const expressWs = require("express-ws")(app);
 
 const runtimeVariables = require("./configs/runtime-variables");
-const javaScriptUtils = require("./app/utils/javascript-utils/javascript-utils");
 const Settings = require("./app/settings/settings");
-const defaultMessage = require("./app/resources/DefaultMessage/DefaultMessage");
 
 const settings = new Settings();
 
@@ -95,11 +93,7 @@ app.get("/disconnect", (req, res) => {
 
 app.ws("/", ws => {
   ws.on("message", () => {
-    if (javaScriptUtils.isDefined(settings.onEvent.message)) {
-      ws.send(JSON.stringify(settings.onEvent.message));
-    } else {
-      ws.send(JSON.stringify(defaultMessage));
-    }
+    ws.send(JSON.stringify(settings.onEvent.message));
   });
 
   if (settings.isPeriodicMessageSendingActive) {
