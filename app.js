@@ -29,6 +29,12 @@ const startSendingPeriodicMessage = ws => {
   }, settings.periodic.intervalInMilliseconds);
 };
 
+const sendPeriodicMessageToAllClients = () => {
+  expressWs.getWss().clients.forEach(client => {
+    startSendingPeriodicMessage(client);
+  });
+};
+
 app.get("/settings/current", (req, res) => {
   const currentSettings = settings.getCurrentSettings();
 
@@ -51,6 +57,12 @@ app.post("/settings/onevent/save", (req, res) => {
 app.post("/settings/periodic/save", (req, res) => {
   settings.setPeriodicSettings(req.body);
 
+  if (settings.isPeriodicMessageSendingActive) {
+    clearInterval(timer);
+
+    sendPeriodicMessageToAllClients();
+  }
+
   const currentSettings = settings.getCurrentSettings();
 
   res.status(200).send({
@@ -62,9 +74,7 @@ app.post("/settings/periodic/save", (req, res) => {
 app.get("/settings/periodic/start", (req, res) => {
   settings.setIsPeriodicMessageSendingActive(true);
 
-  expressWs.getWss().clients.forEach(client => {
-    startSendingPeriodicMessage(client);
-  });
+  sendPeriodicMessageToAllClients();
 
   res.status(200).json({
     success: true
