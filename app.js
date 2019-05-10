@@ -18,7 +18,7 @@ app.use(express.static(path.join(__dirname, "scripts")));
 
 let timer;
 
-const startSendingPeriodicMessage = ws => {
+const createPeriodicMessageInterval = ws => {
   timer = setInterval(() => {
     // https://github.com/websockets/ws/issues/793
     const isConnectionOpen = ws.readyState === ws.OPEN;
@@ -31,7 +31,7 @@ const startSendingPeriodicMessage = ws => {
 
 const sendPeriodicMessageToAllClients = () => {
   expressWs.getWss().clients.forEach(client => {
-    startSendingPeriodicMessage(client);
+    createPeriodicMessageInterval(client);
   });
 };
 
@@ -107,7 +107,7 @@ app.ws("/", ws => {
   });
 
   if (settings.isPeriodicMessageSendingActive) {
-    startSendingPeriodicMessage(ws);
+    createPeriodicMessageInterval(ws);
   }
 });
 
