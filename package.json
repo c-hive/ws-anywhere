@@ -26,6 +26,7 @@
     "mongoose": "^5.5.8"
   },
   "devDependencies": {
+    "dotenv": "^8.0.0",
     "eslint": "^5.16.0",
     "eslint-config-prettier": "^4.2.0",
     "eslint-plugin-node": "^8.0.1",

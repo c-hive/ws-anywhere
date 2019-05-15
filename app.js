@@ -1,6 +1,7 @@
 const path = require("path");
 const bodyParser = require("body-parser");
 const express = require("express");
+const mongoose = require("mongoose");
 
 const app = express();
 const expressWs = require("express-ws")(app);
@@ -9,6 +10,10 @@ const runtimeVariables = require("./configs/runtime-variables");
 const Settings = require("./app/settings/settings");
 
 const settings = new Settings();
+
+mongoose.connect(runtimeVariables.dbURI, err => {
+  if (err) throw new Error("Incorrect MongoDB connection URI - " + err);
+});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
