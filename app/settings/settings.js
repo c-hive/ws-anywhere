@@ -1,18 +1,6 @@
 const javaScriptUtils = require("../utils/javascript-utils/javascript-utils");
 const settingsSchema = require("../db/settings-model");
 
-const save = (id, data) => {
-  if (javaScriptUtils.isDefined(id)) {
-    settingsSchema.findByIdAndUpdate(id, data);
-  } else {
-    const newSettings = new settingsSchema({
-      onEvent: data.message
-    });
-
-    newSettings.save();
-  }
-};
-
 // TODO: How about disabling the button so that avoid spamming DB calls?
 class Settings {
   constructor() {
@@ -40,16 +28,16 @@ class Settings {
     this.onEvent = {
       message: javaScriptUtils.deepCopyObject(onEventSettings.message)
     };
-
-    save(this.id, { onEvent: onEventSettings.message });
   }
 
   setPeriodicSettings(periodicSettings) {
+    const intervalInMilliseconds = this.convertSecondsToMilliseconds(
+      Number(periodicSettings.periodInSeconds)
+    );
+
     this.periodic = {
       message: javaScriptUtils.deepCopyObject(periodicSettings.message),
-      intervalInMilliseconds: this.convertSecondsToMilliseconds(
-        Number(periodicSettings.periodInSeconds)
-      )
+      intervalInMilliseconds
     };
   }
 
@@ -59,6 +47,7 @@ class Settings {
 
   getCurrentSettings() {
     return {
+      id: this.id,
       onEvent: javaScriptUtils.deepCopyObject(this.onEvent),
       periodic: javaScriptUtils.deepCopyObject(this.periodic),
       isPeriodicMessageSendingActive: this.isPeriodicMessageSendingActive
@@ -67,16 +56,19 @@ class Settings {
 
   loadValuesFromDb() {
     settingsSchema.find({}, (err, data) => {
-      this.id = data[0]._id;
+      // `find` returns an array by default.
+      if (javaScriptUtils.isDefined(data[0])) {
+        this.id = data[0]._id;
 
-      this.onEvent = {
-        message: data[0].onEvent
-      };
+        this.onEvent = {
+          message: data[0].onEvent
+        };
 
-      this.periodic = {
-        message: data[0].periodic,
-        intervalInMilliseconds: data[0].intervalInMilliseconds
-      };
+        this.periodic = {
+          message: data[0].periodic,
+          intervalInMilliseconds: data[0].intervalInMilliseconds
+        };
+      }
     });
   }
 }

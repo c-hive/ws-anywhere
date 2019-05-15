@@ -8,8 +8,13 @@ const expressWs = require("express-ws")(app);
 
 const runtimeVariables = require("./configs/runtime-variables");
 const Settings = require("./app/settings/settings");
+const javaScriptUtils = require("./app/utils/javascript-utils/javascript-utils");
+const settingsSchema = require("./app/db/settings-model");
 
 const settings = new Settings();
+
+// https://mongoosejs.com/docs/deprecations.html
+mongoose.set("useFindAndModify", false);
 
 mongoose.connect(runtimeVariables.dbURI, err => {
   if (err) throw new Error("Incorrect MongoDB connection URI - " + err);
@@ -22,6 +27,25 @@ app.use(bodyParser.json());
 
 app.use(express.static(path.join(__dirname, "resources")));
 app.use(express.static(path.join(__dirname, "scripts")));
+
+const save = (id, data) => {
+  if (javaScriptUtils.isDefined(id)) {
+    // TODO: should tbe callback be used/defined?
+    settingsSchema.findByIdAndUpdate(id, data, err => {
+      // eslint-disable-next-line no-console
+      if (err) console.error(err);
+    });
+  } else {
+    const newSettings = new settingsSchema({
+      onEvent: data.message
+    });
+
+    newSettings.save(err => {
+      // eslint-disable-next-line no-console
+      if (err) console.error(err);
+    });
+  }
+};
 
 let timer;
 
@@ -55,6 +79,12 @@ app.post("/settings/onevent/save", (req, res) => {
 
   const currentSettings = settings.getCurrentSettings();
 
+  save(currentSettings.id, {
+    onEvent: currentSettings.onEvent.message,
+    periodic: currentSettings.periodic.message,
+    intervalInMilliseconds: currentSettings.periodic.intervalInMilliseconds
+  });
+
   res.status(200).json({
     success: true,
     currentSettings
@@ -71,6 +101,12 @@ app.post("/settings/periodic/save", (req, res) => {
   }
 
   const currentSettings = settings.getCurrentSettings();
+
+  save(currentSettings.id, {
+    onEvent: currentSettings.onEvent.message,
+    periodic: currentSettings.periodic.message,
+    intervalInMilliseconds: currentSettings.periodic.intervalInMilliseconds
+  });
 
   res.status(200).send({
     success: true,
