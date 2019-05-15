@@ -180,11 +180,8 @@ function peridocActionButtonsAreDisabled() {
 
 function setInputValues(data) {
   if (isDefined(data.currentSettings.onEvent.message)) {
-    document.getElementById("onEventResponseMessage").value = JSON.stringify(
-      data.currentSettings.onEvent.message,
-      undefined,
-      2
-    );
+    document.getElementById("onEventResponseMessage").value =
+      data.currentSettings.onEvent.message;
   }
 
   if (isDefined(data.currentSettings.periodic.message)) {
@@ -237,14 +234,18 @@ function getPeriodicMessageSettings() {
   };
 }
 
-function getOnEventMessage() {
-  return document.getElementById("onEventResponseMessage").value;
+function getOnEventMessageSettings() {
+  const message = document.getElementById("onEventResponseMessage").value;
+
+  return {
+    message
+  };
 }
 
 function checkIfOnEventMessageIsValid() {
-  const onEventResponseMessage = getOnEventMessage();
+  const onEventResponseMessage = getOnEventMessageSettings();
 
-  if (isJson(onEventResponseMessage)) {
+  if (isJson(onEventResponseMessage.message)) {
     return true;
   }
 
@@ -264,7 +265,7 @@ function checkIfPeriodicMessageIsValid() {
 // eslint-disable-next-line no-unused-vars
 function submitOnEventMessage() {
   if (checkIfOnEventMessageIsValid()) {
-    const onEventPostMessage = getOnEventMessage();
+    const onEventPostMessageSettings = getOnEventMessageSettings();
 
     const postUrl = "/settings/onevent/save";
 
@@ -274,7 +275,7 @@ function submitOnEventMessage() {
         "Content-Type": "application/json"
       },
       method: "POST",
-      body: onEventPostMessage
+      body: JSON.stringify(onEventPostMessageSettings)
     })
       .then(response => response.json())
       .then(parsedResponse => {

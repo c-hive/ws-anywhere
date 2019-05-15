@@ -1,7 +1,23 @@
 const javaScriptUtils = require("../utils/javascript-utils/javascript-utils");
+const settingsSchema = require("../db/settings-model");
 
+const save = (id, data) => {
+  if (javaScriptUtils.isDefined(id)) {
+    settingsSchema.findByIdAndUpdate(id, data);
+  } else {
+    const newSettings = new settingsSchema({
+      onEvent: data.message
+    });
+
+    newSettings.save();
+  }
+};
+
+// TODO: How about disabling the button so that avoid spamming DB calls?
 class Settings {
   constructor() {
+    this.id = null;
+
     this.onEvent = {
       message: null
     };
@@ -20,10 +36,12 @@ class Settings {
     return seconds * oneSecondInMilliseconds;
   }
 
-  setOnEventSettings(onEventResponseMessage) {
+  setOnEventSettings(onEventSettings) {
     this.onEvent = {
-      message: javaScriptUtils.deepCopyObject(onEventResponseMessage)
+      message: javaScriptUtils.deepCopyObject(onEventSettings.message)
     };
+
+    save(this.id, { onEvent: onEventSettings.message });
   }
 
   setPeriodicSettings(periodicSettings) {
@@ -45,6 +63,21 @@ class Settings {
       periodic: javaScriptUtils.deepCopyObject(this.periodic),
       isPeriodicMessageSendingActive: this.isPeriodicMessageSendingActive
     };
+  }
+
+  loadValuesFromDb() {
+    settingsSchema.find({}, (err, data) => {
+      this.id = data[0]._id;
+
+      this.onEvent = {
+        message: data[0].onEvent
+      };
+
+      this.periodic = {
+        message: data[0].periodic,
+        intervalInMilliseconds: data[0].intervalInMilliseconds
+      };
+    });
   }
 }
 

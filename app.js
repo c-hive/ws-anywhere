@@ -13,6 +13,8 @@ const settings = new Settings();
 
 mongoose.connect(runtimeVariables.dbURI, err => {
   if (err) throw new Error("Incorrect MongoDB connection URI - " + err);
+
+  settings.loadValuesFromDb();
 });
 
 app.use(bodyParser.urlencoded({ extended: false }));
