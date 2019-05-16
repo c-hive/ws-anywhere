@@ -1,19 +1,23 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const settingsSchema = new Schema({
-  onEvent: {
+const setting = new Schema({
+  onEventMessage: {
     type: String,
     default: null
   },
-  periodic: {
+  periodicMessage: {
     type: String,
     default: null
   },
   intervalInMilliseconds: {
     type: Number,
     default: 0
+  },
+  isPeriodicMessageSendingActive: {
+    type: Boolean,
+    default: false
   }
 });
 
-module.exports = mongoose.model("Settings", settingsSchema);
+module.exports = mongoose.model("Setting", setting);

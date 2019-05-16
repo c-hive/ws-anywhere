@@ -179,19 +179,18 @@ function peridocActionButtonsAreDisabled() {
 }
 
 function setInputValues(data) {
-  if (isDefined(data.currentSettings.onEvent.message)) {
+  if (isDefined(data.currentSettings.onEventMessage)) {
     document.getElementById("onEventResponseMessage").value =
-      data.currentSettings.onEvent.message;
+      data.currentSettings.onEventMessage;
   }
 
-  if (isDefined(data.currentSettings.periodic.message)) {
+  if (isDefined(data.currentSettings.periodicMessage)) {
     const oneSecondInMilliseconds = 1000;
 
     document.getElementById("periodicResponseMessage").value =
-      data.currentSettings.periodic.message;
+      data.currentSettings.periodicMessage;
     document.getElementById("periodInSeconds").value =
-      data.currentSettings.periodic.intervalInMilliseconds /
-      oneSecondInMilliseconds;
+      data.currentSettings.intervalInMilliseconds / oneSecondInMilliseconds;
 
     updatePeriodicActionButtonsDisabledProperty({
       start: data.currentSettings.isPeriodicMessageSendingActive,
@@ -224,48 +223,50 @@ function disconnectAllClients() {
 }
 
 function getPeriodicMessageSettings() {
-  const message = document.getElementById("periodicResponseMessage").value;
+  const periodicMessage = document.getElementById("periodicResponseMessage")
+    .value;
 
   const periodInSeconds = document.getElementById("periodInSeconds").value;
 
   return {
-    message,
-    periodInSeconds
+    periodicMessage,
+    intervalInMilliseconds: convertSecondsToMilliseconds(periodInSeconds)
   };
 }
 
+function convertSecondsToMilliseconds(seconds) {
+  const oneSecondInMilliseconds = 1000;
+
+  return seconds * oneSecondInMilliseconds;
+}
+
 function getOnEventMessageSettings() {
-  const message = document.getElementById("onEventResponseMessage").value;
+  const onEventMessage = document.getElementById("onEventResponseMessage")
+    .value;
 
   return {
-    message
+    onEventMessage
   };
 }
 
 function checkIfOnEventMessageIsValid() {
+  // TODO: rename?
   const onEventResponseMessage = getOnEventMessageSettings();
 
-  if (isJson(onEventResponseMessage.message)) {
-    return true;
-  }
-
-  return false;
+  return isJson(onEventResponseMessage.onEventMessage);
 }
 
 function checkIfPeriodicMessageIsValid() {
+  // TODO: rename?
   const periodicMessageSettings = getPeriodicMessageSettings();
 
-  if (isJson(periodicMessageSettings.message)) {
-    return true;
-  }
-
-  return false;
+  return isJson(periodicMessageSettings.periodicMessage);
 }
 
 // eslint-disable-next-line no-unused-vars
 function submitOnEventMessage() {
   if (checkIfOnEventMessageIsValid()) {
-    const onEventPostMessageSettings = getOnEventMessageSettings();
+    const onEventMessageSettings = getOnEventMessageSettings();
 
     const postUrl = "/settings/onevent/save";
 
@@ -275,7 +276,7 @@ function submitOnEventMessage() {
         "Content-Type": "application/json"
       },
       method: "POST",
-      body: JSON.stringify(onEventPostMessageSettings)
+      body: JSON.stringify(onEventMessageSettings)
     })
       .then(response => response.json())
       .then(parsedResponse => {
