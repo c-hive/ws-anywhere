@@ -20,9 +20,11 @@ window.onload = function() {
   const getUrl = "/settings/current";
 
   fetch(getUrl)
-    .then(currentSettings => currentSettings.json())
-    .then(parsedCurrentSettings => {
-      setInputValues(parsedCurrentSettings);
+    .then(responseData => responseData.json())
+    .then(parsedResponseData => {
+      if (parsedResponseData.success) {
+        setInputValues(parsedResponseData.currentSettings);
+      }
     });
 
   createFeedbackElements();
@@ -179,22 +181,22 @@ function peridocActionButtonsAreDisabled() {
 }
 
 function setInputValues(data) {
-  if (isDefined(data.currentSettings.onEventMessage)) {
+  if (isDefined(data.onEventMessage)) {
     document.getElementById("onEventResponseMessage").value =
-      data.currentSettings.onEventMessage;
+      data.onEventMessage;
   }
 
-  if (isDefined(data.currentSettings.periodicMessage)) {
+  if (isDefined(data.periodicMessage)) {
     const oneSecondInMilliseconds = 1000;
 
     document.getElementById("periodicResponseMessage").value =
-      data.currentSettings.periodicMessage;
+      data.periodicMessage;
     document.getElementById("periodInSeconds").value =
-      data.currentSettings.intervalInMilliseconds / oneSecondInMilliseconds;
+      data.intervalInMilliseconds / oneSecondInMilliseconds;
 
     updatePeriodicActionButtonsDisabledProperty({
-      start: data.currentSettings.isPeriodicMessageSendingActive,
-      stop: !data.currentSettings.isPeriodicMessageSendingActive
+      start: data.isPeriodicMessageSendingActive,
+      stop: !data.isPeriodicMessageSendingActive
     });
   } else {
     updatePeriodicActionButtonsDisabledProperty({

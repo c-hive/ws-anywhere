@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const app = express();
 const expressWs = require("express-ws")(app);
 
+const javaScriptUtils = require("./app/utils/javascript-utils/javascript-utils");
 const runtimeVariables = require("./configs/runtime-variables");
 const Setting = require("./app/db/setting");
 const SettingPersister = require("./app/setting-persister/setting-persister");
@@ -41,7 +42,6 @@ let timer;
 
 const createPeriodicMessageInterval = ws => {
   settingPersister.copy((err, copiedData) => {
-    // FIXME: no errors please! :)
     // eslint-disable-next-line no-console
     if (err) return console.error(err);
 
@@ -64,8 +64,14 @@ const sendPeriodicMessageToAllClients = () => {
 
 app.get("/settings/current", (req, res) => {
   settingPersister.copy((err, copiedData) => {
-    // TODO: error handling.
+    if (err) {
+      return res.status(200).json({
+        success: false
+      });
+    }
+
     res.status(200).json({
+      success: true,
       currentSettings: copiedData
     });
   });
@@ -161,11 +167,15 @@ app.get("/disconnect", (req, res) => {
 app.ws("/", ws => {
   ws.on("message", () => {
     settingPersister.copy((err, copiedData) => {
-      ws.send(JSON.stringify(copiedData.onEventMessage));
+      // TODO: error handling?
+      if (javaScriptUtils.isDefined(copiedData.onEventMessage)) {
+        ws.send(copiedData.onEventMessage);
+      }
     });
   });
 
   settingPersister.copy((err, copiedData) => {
+    // TODO: error handling?
     if (copiedData.isPeriodicMessageSendingActive) {
       createPeriodicMessageInterval(ws);
     }
