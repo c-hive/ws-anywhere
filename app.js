@@ -1,14 +1,38 @@
 const path = require("path");
 const bodyParser = require("body-parser");
 const express = require("express");
+const mongoose = require("mongoose");
 
 const app = express();
 const expressWs = require("express-ws")(app);
 
+const javaScriptUtils = require("./app/utils/javascript-utils/javascript-utils");
 const runtimeVariables = require("./configs/runtime-variables");
-const Settings = require("./app/settings/settings");
+const Setting = require("./app/db/setting");
 
-const settings = new Settings();
+let setting;
+
+mongoose.connect(runtimeVariables.dbURI, err => {
+  if (err) {
+    if (err.name === "MongoNetworkError") {
+      throw new Error("Incorrect MongoDB connection uri.");
+    } else {
+      throw err;
+    }
+  }
+
+  Setting.countDocuments({}, (_, count) => {
+    const dbIsEmpty = count === 0;
+
+    if (dbIsEmpty) {
+      setting = new Setting();
+
+      setting.save(err => {
+        if (err) throw err;
+      });
+    }
+  });
+});
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -19,14 +43,18 @@ app.use(express.static(path.join(__dirname, "scripts")));
 let timer;
 
 const createPeriodicMessageInterval = ws => {
-  timer = setInterval(() => {
-    // https://github.com/websockets/ws/issues/793
-    const isConnectionOpen = ws.readyState === ws.OPEN;
+  Setting.findById(setting._id, (err, copiedSettings) => {
+    if (err) throw err;
 
-    if (isConnectionOpen) {
-      ws.send(settings.periodic.message);
-    }
-  }, settings.periodic.intervalInMilliseconds);
+    timer = setInterval(() => {
+      // https://github.com/websockets/ws/issues/793
+      const isConnectionOpen = ws.readyState === ws.OPEN;
+
+      if (isConnectionOpen) {
+        ws.send(copiedSettings.periodicMessage);
+      }
+    }, copiedSettings.interval * 1000);
+  });
 };
 
 const sendPeriodicMessageToAllClients = () => {
@@ -36,58 +64,73 @@ const sendPeriodicMessageToAllClients = () => {
 };
 
 app.get("/settings/current", (req, res) => {
-  const currentSettings = settings.getCurrentSettings();
+  Setting.findById(setting._id, (err, copiedSettings) => {
+    if (err) throw err;
 
-  res.status(200).json({
-    currentSettings
+    res.status(200).json({
+      success: true,
+      currentSettings: copiedSettings
+    });
   });
 });
 
 app.post("/settings/onevent/save", (req, res) => {
-  settings.setOnEventSettings(req.body);
+  Setting.findOneAndUpdate(setting._id, req.body, (err, updatedSettings) => {
+    if (err) throw err;
 
-  const currentSettings = settings.getCurrentSettings();
-
-  res.status(200).json({
-    success: true,
-    currentSettings
+    res.status(200).json({
+      success: true,
+      currentSettings: updatedSettings
+    });
   });
 });
 
 app.post("/settings/periodic/save", (req, res) => {
-  settings.setPeriodicSettings(req.body);
+  Setting.findOneAndUpdate(setting._id, req.body, (err, updatedSettings) => {
+    if (err) throw err;
 
-  if (settings.isPeriodicMessageSendingActive) {
-    clearInterval(timer);
+    if (updatedSettings.isPeriodicMessageSendingActive) {
+      clearInterval(timer);
 
-    sendPeriodicMessageToAllClients();
-  }
+      sendPeriodicMessageToAllClients();
+    }
 
-  const currentSettings = settings.getCurrentSettings();
-
-  res.status(200).send({
-    success: true,
-    currentSettings
+    res.status(200).send({
+      success: true,
+      currentSettings: updatedSettings
+    });
   });
 });
 
 app.get("/settings/periodic/start", (req, res) => {
-  settings.setIsPeriodicMessageSendingActive(true);
+  const data = {
+    isPeriodicMessageSendingActive: true
+  };
 
-  sendPeriodicMessageToAllClients();
+  Setting.findOneAndUpdate(setting._id, data, err => {
+    if (err) throw err;
 
-  res.status(200).json({
-    success: true
+    sendPeriodicMessageToAllClients();
+
+    res.status(200).json({
+      success: true
+    });
   });
 });
 
 app.get("/settings/periodic/stop", (req, res) => {
-  settings.setIsPeriodicMessageSendingActive(false);
+  const data = {
+    isPeriodicMessageSendingActive: false
+  };
 
-  clearInterval(timer);
+  Setting.findOneAndUpdate(setting._id, data, err => {
+    if (err) throw err;
 
-  res.status(200).json({
-    success: true
+    clearInterval(timer);
+
+    res.status(200).json({
+      success: true
+    });
   });
 });
 
@@ -103,12 +146,22 @@ app.get("/disconnect", (req, res) => {
 
 app.ws("/", ws => {
   ws.on("message", () => {
-    ws.send(JSON.stringify(settings.onEvent.message));
+    Setting.findById(setting._id, (err, copiedSettings) => {
+      if (err) throw err;
+
+      if (javaScriptUtils.isDefined(copiedSettings.onEventMessage)) {
+        ws.send(copiedSettings.onEventMessage);
+      }
+    });
   });
 
-  if (settings.isPeriodicMessageSendingActive) {
-    createPeriodicMessageInterval(ws);
-  }
+  Setting.findById(setting._id, (err, copiedSettings) => {
+    if (err) throw err;
+
+    if (copiedSettings.isPeriodicMessageSendingActive) {
+      createPeriodicMessageInterval(ws);
+    }
+  });
 });
 
 app

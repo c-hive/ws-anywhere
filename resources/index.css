@@ -8,7 +8,7 @@ input, textarea {
     padding: 10px 15px;
 }
 
-input[name="periodInSeconds"] {
+input[name="interval"] {
     padding: 10px 5px;
 }
 

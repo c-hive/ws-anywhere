@@ -20,9 +20,11 @@ window.onload = function() {
   const getUrl = "/settings/current";
 
   fetch(getUrl)
-    .then(currentSettings => currentSettings.json())
-    .then(parsedCurrentSettings => {
-      setInputValues(parsedCurrentSettings);
+    .then(responseData => responseData.json())
+    .then(parsedResponseData => {
+      if (parsedResponseData.success) {
+        setInputValues(parsedResponseData.currentSettings);
+      }
     });
 
   createFeedbackElements();
@@ -179,26 +181,19 @@ function peridocActionButtonsAreDisabled() {
 }
 
 function setInputValues(data) {
-  if (isDefined(data.currentSettings.onEvent.message)) {
-    document.getElementById("onEventResponseMessage").value = JSON.stringify(
-      data.currentSettings.onEvent.message,
-      undefined,
-      2
-    );
+  if (isDefined(data.onEventMessage)) {
+    document.getElementById("onEventResponseMessage").value =
+      data.onEventMessage;
   }
 
-  if (isDefined(data.currentSettings.periodic.message)) {
-    const oneSecondInMilliseconds = 1000;
-
+  if (isDefined(data.periodicMessage)) {
     document.getElementById("periodicResponseMessage").value =
-      data.currentSettings.periodic.message;
-    document.getElementById("periodInSeconds").value =
-      data.currentSettings.periodic.intervalInMilliseconds /
-      oneSecondInMilliseconds;
+      data.periodicMessage;
+    document.getElementById("interval").value = data.interval;
 
     updatePeriodicActionButtonsDisabledProperty({
-      start: data.currentSettings.isPeriodicMessageSendingActive,
-      stop: !data.currentSettings.isPeriodicMessageSendingActive
+      start: data.isPeriodicMessageSendingActive,
+      stop: !data.isPeriodicMessageSendingActive
     });
   } else {
     updatePeriodicActionButtonsDisabledProperty({
@@ -227,44 +222,42 @@ function disconnectAllClients() {
 }
 
 function getPeriodicMessageSettings() {
-  const message = document.getElementById("periodicResponseMessage").value;
+  const periodicMessage = document.getElementById("periodicResponseMessage")
+    .value;
 
-  const periodInSeconds = document.getElementById("periodInSeconds").value;
+  const interval = document.getElementById("interval").value;
 
   return {
-    message,
-    periodInSeconds
+    periodicMessage,
+    interval
   };
 }
 
-function getOnEventMessage() {
-  return document.getElementById("onEventResponseMessage").value;
+function getOnEventMessageSettings() {
+  const onEventMessage = document.getElementById("onEventResponseMessage")
+    .value;
+
+  return {
+    onEventMessage
+  };
 }
 
 function checkIfOnEventMessageIsValid() {
-  const onEventResponseMessage = getOnEventMessage();
+  const settings = getOnEventMessageSettings();
 
-  if (isJson(onEventResponseMessage)) {
-    return true;
-  }
-
-  return false;
+  return isJson(settings.onEventMessage);
 }
 
 function checkIfPeriodicMessageIsValid() {
-  const periodicMessageSettings = getPeriodicMessageSettings();
+  const settings = getPeriodicMessageSettings();
 
-  if (isJson(periodicMessageSettings.message)) {
-    return true;
-  }
-
-  return false;
+  return isJson(settings.periodicMessage);
 }
 
 // eslint-disable-next-line no-unused-vars
 function submitOnEventMessage() {
   if (checkIfOnEventMessageIsValid()) {
-    const onEventPostMessage = getOnEventMessage();
+    const onEventMessageSettings = getOnEventMessageSettings();
 
     const postUrl = "/settings/onevent/save";
 
@@ -274,7 +267,7 @@ function submitOnEventMessage() {
         "Content-Type": "application/json"
       },
       method: "POST",
-      body: onEventPostMessage
+      body: JSON.stringify(onEventMessageSettings)
     })
       .then(response => response.json())
       .then(parsedResponse => {
