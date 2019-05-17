@@ -7,7 +7,7 @@
 
 #### Heroku setup
 
-If the target deployment service is Heroku, you should also add `mLab` to the plugins list.
+If the target deployment service is Heroku, here is an example script that setups the environment automatically.
 
 ```bash
 export HEROKU_APP=ws-anywhere
