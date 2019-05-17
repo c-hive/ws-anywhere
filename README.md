@@ -2,12 +2,18 @@
 
 #### Customizable WebSocket test server in 3 easy steps:
 - [Fork me](https://github.com/c-hive/ws-anywhere/fork)
-- Deploy somewhere(MongoDB is required)
+- [Deploy me](https://github.com/c-hive/ws-anywhere#deployment)
 - Set responses on the server's UI
 
-#### Heroku setup
+## Features
 
-If the target deployment service is Heroku, here is an example script that sets up the environment automatically.
+- Send custom message on message received
+- Send custom message periodically
+- Disconnect from clients
+
+## Deployment
+
+Use this script te (re)set the app in an idempotent way on Heroku.
 
 ```bash
 export HEROKU_APP=ws-anywhere
@@ -22,9 +28,3 @@ git push heroku master
 
 heroku ps:scale web=1
 ```
-
-## Features
-
-- Send custom message on message received
-- Send custom message periodically
-- Disconnect from clients
