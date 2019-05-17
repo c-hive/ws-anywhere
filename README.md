@@ -13,7 +13,7 @@
 
 ## Deployment
 
-Use this script te (re)set the app in an idempotent way on Heroku.
+Use this script to (re)set the app in an idempotent way on Heroku.
 
 ```bash
 export HEROKU_APP=ws-anywhere
