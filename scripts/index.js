@@ -245,17 +245,15 @@ function getOnEventMessageSettings() {
 }
 
 function checkIfOnEventMessageIsValid() {
-  // TODO: rename?
-  const onEventResponseMessage = getOnEventMessageSettings();
+  const settings = getOnEventMessageSettings();
 
-  return isJson(onEventResponseMessage.onEventMessage);
+  return isJson(settings.onEventMessage);
 }
 
 function checkIfPeriodicMessageIsValid() {
-  // TODO: rename?
-  const periodicMessageSettings = getPeriodicMessageSettings();
+  const settings = getPeriodicMessageSettings();
 
-  return isJson(periodicMessageSettings.periodicMessage);
+  return isJson(settings.periodicMessage);
 }
 
 // eslint-disable-next-line no-unused-vars
