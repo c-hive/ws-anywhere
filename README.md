@@ -2,7 +2,7 @@
 
 #### Customizable WebSocket test server in 3 easy steps:
 - [Fork me](https://github.com/c-hive/ws-anywhere/fork)
-- Deploy somewhere
+- Deploy somewhere(MongoDB is required)
 - Set responses on the server's UI
 
 #### Heroku setup
