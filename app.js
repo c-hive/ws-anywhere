@@ -13,18 +13,22 @@ const Setting = require("./app/db/setting");
 let settingPersister;
 
 mongoose.connect(runtimeVariables.dbURI, err => {
-  if (err) throw new Error("Incorrect MongoDB connection URI - " + err);
+  if (err) {
+    if (err.name === "MongoNetworkError") {
+      throw new Error("Incorrect MongoDB connection uri.");
+    } else {
+      throw err;
+    }
+  }
 
-  Setting.count({}, (_, count) => {
+  Setting.countDocuments({}, (_, count) => {
     const dbIsEmpty = count === 0;
 
     if (dbIsEmpty) {
       settingPersister = new Setting();
 
-      settingPersister.save(() => {
-        // eslint-disable-next-line no-console
-        // if (err) console.error(err);
-        // ???
+      settingPersister.save(err => {
+        if (err) throw err;
       });
     }
   });
@@ -40,6 +44,8 @@ let timer;
 
 const createPeriodicMessageInterval = ws => {
   Setting.findById(settingPersister._id, (err, settings) => {
+    if (err) throw err;
+
     timer = setInterval(() => {
       // https://github.com/websockets/ws/issues/793
       const isConnectionOpen = ws.readyState === ws.OPEN;
@@ -47,7 +53,7 @@ const createPeriodicMessageInterval = ws => {
       if (isConnectionOpen) {
         ws.send(settings.periodicMessage);
       }
-    }, settings.intervalInMilliseconds);
+    }, settings.interval * 1000);
   });
 };
 
@@ -59,6 +65,8 @@ const sendPeriodicMessageToAllClients = () => {
 
 app.get("/settings/current", (req, res) => {
   Setting.findById(settingPersister._id, (err, settings) => {
+    if (err) throw err;
+
     res.status(200).json({
       success: true,
       currentSettings: settings
@@ -71,6 +79,8 @@ app.post("/settings/onevent/save", (req, res) => {
     settingPersister._id,
     req.body,
     (err, updatedSettings) => {
+      if (err) throw err;
+
       res.status(200).json({
         success: true,
         currentSettings: updatedSettings
@@ -84,6 +94,8 @@ app.post("/settings/periodic/save", (req, res) => {
     settingPersister._id,
     req.body,
     (err, updatedSettings) => {
+      if (err) throw err;
+
       if (updatedSettings.isPeriodicMessageSendingActive) {
         clearInterval(timer);
 
@@ -103,7 +115,9 @@ app.get("/settings/periodic/start", (req, res) => {
     isPeriodicMessageSendingActive: true
   };
 
-  Setting.findOneAndDelete(settingPersister._id, data, () => {
+  Setting.findOneAndUpdate(settingPersister._id, data, err => {
+    if (err) throw err;
+
     sendPeriodicMessageToAllClients();
 
     res.status(200).json({
@@ -117,7 +131,9 @@ app.get("/settings/periodic/stop", (req, res) => {
     isPeriodicMessageSendingActive: false
   };
 
-  Setting.findOneAndUpdate(settingPersister._id, data, () => {
+  Setting.findOneAndUpdate(settingPersister._id, data, err => {
+    if (err) throw err;
+
     clearInterval(timer);
 
     res.status(200).json({
@@ -139,6 +155,8 @@ app.get("/disconnect", (req, res) => {
 app.ws("/", ws => {
   ws.on("message", () => {
     Setting.findById(settingPersister._id, (err, settings) => {
+      if (err) throw err;
+
       if (javaScriptUtils.isDefined(settings.onEventMessage)) {
         ws.send(settings.onEventMessage);
       }
@@ -146,6 +164,8 @@ app.ws("/", ws => {
   });
 
   Setting.findById(settingPersister._id, (err, settings) => {
+    if (err) throw err;
+
     if (settings.isPeriodicMessageSendingActive) {
       createPeriodicMessageInterval(ws);
     }

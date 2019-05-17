@@ -10,9 +10,9 @@ const setting = new Schema({
     type: String,
     default: null
   },
-  intervalInMilliseconds: {
+  interval: {
     type: Number,
-    default: 0
+    default: 10
   },
   isPeriodicMessageSendingActive: {
     type: Boolean,

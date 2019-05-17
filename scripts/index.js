@@ -187,12 +187,11 @@ function setInputValues(data) {
   }
 
   if (isDefined(data.periodicMessage)) {
-    const oneSecondInMilliseconds = 1000;
+    // const oneSecondInMilliseconds = 1000;
 
     document.getElementById("periodicResponseMessage").value =
       data.periodicMessage;
-    document.getElementById("periodInSeconds").value =
-      data.intervalInMilliseconds / oneSecondInMilliseconds;
+    document.getElementById("interval").value = data.interval;
 
     updatePeriodicActionButtonsDisabledProperty({
       start: data.isPeriodicMessageSendingActive,
@@ -228,18 +227,12 @@ function getPeriodicMessageSettings() {
   const periodicMessage = document.getElementById("periodicResponseMessage")
     .value;
 
-  const periodInSeconds = document.getElementById("periodInSeconds").value;
+  const interval = document.getElementById("interval").value;
 
   return {
     periodicMessage,
-    intervalInMilliseconds: convertSecondsToMilliseconds(periodInSeconds)
+    interval
   };
-}
-
-function convertSecondsToMilliseconds(seconds) {
-  const oneSecondInMilliseconds = 1000;
-
-  return seconds * oneSecondInMilliseconds;
 }
 
 function getOnEventMessageSettings() {
