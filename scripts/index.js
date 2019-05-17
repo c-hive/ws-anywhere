@@ -187,8 +187,6 @@ function setInputValues(data) {
   }
 
   if (isDefined(data.periodicMessage)) {
-    // const oneSecondInMilliseconds = 1000;
-
     document.getElementById("periodicResponseMessage").value =
       data.periodicMessage;
     document.getElementById("interval").value = data.interval;

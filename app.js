@@ -8,9 +8,9 @@ const expressWs = require("express-ws")(app);
 
 const javaScriptUtils = require("./app/utils/javascript-utils/javascript-utils");
 const runtimeVariables = require("./configs/runtime-variables");
-const Setting = require("./app/db/setting");
+const Settings = require("./app/db/settings");
 
-let settingPersister;
+let settings;
 
 mongoose.connect(runtimeVariables.dbURI, err => {
   if (err) {
@@ -21,13 +21,13 @@ mongoose.connect(runtimeVariables.dbURI, err => {
     }
   }
 
-  Setting.countDocuments({}, (_, count) => {
+  Settings.countDocuments({}, (_, count) => {
     const dbIsEmpty = count === 0;
 
     if (dbIsEmpty) {
-      settingPersister = new Setting();
+      settings = new Settings();
 
-      settingPersister.save(err => {
+      settings.save(err => {
         if (err) throw err;
       });
     }
@@ -43,7 +43,7 @@ app.use(express.static(path.join(__dirname, "scripts")));
 let timer;
 
 const createPeriodicMessageInterval = ws => {
-  Setting.findById(settingPersister._id, (err, settings) => {
+  Settings.findById(settings._id, (err, settings) => {
     if (err) throw err;
 
     timer = setInterval(() => {
@@ -64,7 +64,7 @@ const sendPeriodicMessageToAllClients = () => {
 };
 
 app.get("/settings/current", (req, res) => {
-  Setting.findById(settingPersister._id, (err, settings) => {
+  Settings.findById(settings._id, (err, settings) => {
     if (err) throw err;
 
     res.status(200).json({
@@ -75,39 +75,31 @@ app.get("/settings/current", (req, res) => {
 });
 
 app.post("/settings/onevent/save", (req, res) => {
-  Setting.findOneAndUpdate(
-    settingPersister._id,
-    req.body,
-    (err, updatedSettings) => {
-      if (err) throw err;
+  Settings.findOneAndUpdate(settings._id, req.body, (err, updatedSettings) => {
+    if (err) throw err;
 
-      res.status(200).json({
-        success: true,
-        currentSettings: updatedSettings
-      });
-    }
-  );
+    res.status(200).json({
+      success: true,
+      currentSettings: updatedSettings
+    });
+  });
 });
 
 app.post("/settings/periodic/save", (req, res) => {
-  Setting.findOneAndUpdate(
-    settingPersister._id,
-    req.body,
-    (err, updatedSettings) => {
-      if (err) throw err;
+  Settings.findOneAndUpdate(settings._id, req.body, (err, updatedSettings) => {
+    if (err) throw err;
 
-      if (updatedSettings.isPeriodicMessageSendingActive) {
-        clearInterval(timer);
+    if (updatedSettings.isPeriodicMessageSendingActive) {
+      clearInterval(timer);
 
-        sendPeriodicMessageToAllClients();
-      }
-
-      res.status(200).send({
-        success: true,
-        currentSettings: updatedSettings
-      });
+      sendPeriodicMessageToAllClients();
     }
-  );
+
+    res.status(200).send({
+      success: true,
+      currentSettings: updatedSettings
+    });
+  });
 });
 
 app.get("/settings/periodic/start", (req, res) => {
@@ -115,7 +107,7 @@ app.get("/settings/periodic/start", (req, res) => {
     isPeriodicMessageSendingActive: true
   };
 
-  Setting.findOneAndUpdate(settingPersister._id, data, err => {
+  Settings.findOneAndUpdate(settings._id, data, err => {
     if (err) throw err;
 
     sendPeriodicMessageToAllClients();
@@ -131,7 +123,7 @@ app.get("/settings/periodic/stop", (req, res) => {
     isPeriodicMessageSendingActive: false
   };
 
-  Setting.findOneAndUpdate(settingPersister._id, data, err => {
+  Settings.findOneAndUpdate(settings._id, data, err => {
     if (err) throw err;
 
     clearInterval(timer);
@@ -154,7 +146,7 @@ app.get("/disconnect", (req, res) => {
 
 app.ws("/", ws => {
   ws.on("message", () => {
-    Setting.findById(settingPersister._id, (err, settings) => {
+    Settings.findById(settings._id, (err, settings) => {
       if (err) throw err;
 
       if (javaScriptUtils.isDefined(settings.onEventMessage)) {
@@ -163,7 +155,7 @@ app.ws("/", ws => {
     });
   });
 
-  Setting.findById(settingPersister._id, (err, settings) => {
+  Settings.findById(settings._id, (err, settings) => {
     if (err) throw err;
 
     if (settings.isPeriodicMessageSendingActive) {
