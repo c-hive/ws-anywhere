@@ -9,7 +9,6 @@ const expressWs = require("express-ws")(app);
 const javaScriptUtils = require("./app/utils/javascript-utils/javascript-utils");
 const runtimeVariables = require("./configs/runtime-variables");
 const Setting = require("./app/db/setting");
-const SettingPersister = require("./app/setting-persister/setting-persister");
 
 let settingPersister;
 
@@ -20,13 +19,12 @@ mongoose.connect(runtimeVariables.dbURI, err => {
     const dbIsEmpty = count === 0;
 
     if (dbIsEmpty) {
-      const newSetting = new Setting();
+      settingPersister = new Setting();
 
-      settingPersister = new SettingPersister(newSetting._id);
-
-      newSetting.save(err => {
+      settingPersister.save(() => {
         // eslint-disable-next-line no-console
-        if (err) console.error(err);
+        // if (err) console.error(err);
+        // ???
       });
     }
   });
@@ -41,18 +39,15 @@ app.use(express.static(path.join(__dirname, "scripts")));
 let timer;
 
 const createPeriodicMessageInterval = ws => {
-  settingPersister.copy((err, copiedData) => {
-    // eslint-disable-next-line no-console
-    if (err) return console.error(err);
-
+  Setting.findById(settingPersister._id, (err, settings) => {
     timer = setInterval(() => {
       // https://github.com/websockets/ws/issues/793
       const isConnectionOpen = ws.readyState === ws.OPEN;
 
       if (isConnectionOpen) {
-        ws.send(copiedData.periodicMessage);
+        ws.send(settings.periodicMessage);
       }
-    }, copiedData.intervalInMilliseconds);
+    }, settings.intervalInMilliseconds);
   });
 };
 
@@ -63,54 +58,44 @@ const sendPeriodicMessageToAllClients = () => {
 };
 
 app.get("/settings/current", (req, res) => {
-  settingPersister.copy((err, copiedData) => {
-    if (err) {
-      return res.status(200).json({
-        success: false
-      });
-    }
-
+  Setting.findById(settingPersister._id, (err, settings) => {
     res.status(200).json({
       success: true,
-      currentSettings: copiedData
+      currentSettings: settings
     });
   });
 });
 
 app.post("/settings/onevent/save", (req, res) => {
-  settingPersister.update(req.body, (err, copiedData) => {
-    if (err) {
-      return res.json({
-        success: false
+  Setting.findOneAndUpdate(
+    settingPersister._id,
+    req.body,
+    (err, updatedSettings) => {
+      res.status(200).json({
+        success: true,
+        currentSettings: updatedSettings
       });
     }
-
-    res.status(200).json({
-      success: true,
-      currentSettings: copiedData
-    });
-  });
+  );
 });
 
 app.post("/settings/periodic/save", (req, res) => {
-  settingPersister.update(req.body, (err, copiedData) => {
-    if (err) {
-      return res.json({
-        success: false
+  Setting.findOneAndUpdate(
+    settingPersister._id,
+    req.body,
+    (err, updatedSettings) => {
+      if (updatedSettings.isPeriodicMessageSendingActive) {
+        clearInterval(timer);
+
+        sendPeriodicMessageToAllClients();
+      }
+
+      res.status(200).send({
+        success: true,
+        currentSettings: updatedSettings
       });
     }
-
-    if (copiedData.isPeriodicMessageSendingActive) {
-      clearInterval(timer);
-
-      sendPeriodicMessageToAllClients();
-    }
-
-    res.status(200).send({
-      success: true,
-      currentSettings: copiedData
-    });
-  });
+  );
 });
 
 app.get("/settings/periodic/start", (req, res) => {
@@ -118,14 +103,7 @@ app.get("/settings/periodic/start", (req, res) => {
     isPeriodicMessageSendingActive: true
   };
 
-  settingPersister.update(data, err => {
-    if (err) {
-      // TODO: add status code!
-      return res.json({
-        success: false
-      });
-    }
-
+  Setting.findOneAndDelete(settingPersister._id, data, () => {
     sendPeriodicMessageToAllClients();
 
     res.status(200).json({
@@ -139,13 +117,7 @@ app.get("/settings/periodic/stop", (req, res) => {
     isPeriodicMessageSendingActive: false
   };
 
-  settingPersister.update(data, err => {
-    if (err) {
-      return res.json({
-        success: false
-      });
-    }
-
+  Setting.findOneAndUpdate(settingPersister._id, data, () => {
     clearInterval(timer);
 
     res.status(200).json({
@@ -166,17 +138,15 @@ app.get("/disconnect", (req, res) => {
 
 app.ws("/", ws => {
   ws.on("message", () => {
-    settingPersister.copy((err, copiedData) => {
-      // TODO: error handling?
-      if (javaScriptUtils.isDefined(copiedData.onEventMessage)) {
-        ws.send(copiedData.onEventMessage);
+    Setting.findById(settingPersister._id, (err, settings) => {
+      if (javaScriptUtils.isDefined(settings.onEventMessage)) {
+        ws.send(settings.onEventMessage);
       }
     });
   });
 
-  settingPersister.copy((err, copiedData) => {
-    // TODO: error handling?
-    if (copiedData.isPeriodicMessageSendingActive) {
+  Setting.findById(settingPersister._id, (err, settings) => {
+    if (settings.isPeriodicMessageSendingActive) {
       createPeriodicMessageInterval(ws);
     }
   });
