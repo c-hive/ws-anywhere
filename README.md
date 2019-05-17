@@ -7,7 +7,7 @@
 
 #### Heroku setup
 
-If the target deployment service is Heroku, here is an example script that setups the environment automatically.
+If the target deployment service is Heroku, here is an example script that sets up the environment automatically.
 
 ```bash
 export HEROKU_APP=ws-anywhere
