@@ -8,9 +8,9 @@ const expressWs = require("express-ws")(app);
 
 const javaScriptUtils = require("./app/utils/javascript-utils/javascript-utils");
 const runtimeVariables = require("./configs/runtime-variables");
-const Settings = require("./app/db/settings");
+const Setting = require("./app/db/setting");
 
-let settings;
+let setting;
 
 mongoose.connect(runtimeVariables.dbURI, err => {
   if (err) {
@@ -21,13 +21,13 @@ mongoose.connect(runtimeVariables.dbURI, err => {
     }
   }
 
-  Settings.countDocuments({}, (_, count) => {
+  Setting.countDocuments({}, (_, count) => {
     const dbIsEmpty = count === 0;
 
     if (dbIsEmpty) {
-      settings = new Settings();
+      setting = new Setting();
 
-      settings.save(err => {
+      setting.save(err => {
         if (err) throw err;
       });
     }
@@ -43,7 +43,7 @@ app.use(express.static(path.join(__dirname, "scripts")));
 let timer;
 
 const createPeriodicMessageInterval = ws => {
-  Settings.findById(settings._id, (err, settings) => {
+  Setting.findById(setting._id, (err, copiedSettings) => {
     if (err) throw err;
 
     timer = setInterval(() => {
@@ -51,9 +51,9 @@ const createPeriodicMessageInterval = ws => {
       const isConnectionOpen = ws.readyState === ws.OPEN;
 
       if (isConnectionOpen) {
-        ws.send(settings.periodicMessage);
+        ws.send(copiedSettings.periodicMessage);
       }
-    }, settings.interval * 1000);
+    }, copiedSettings.interval * 1000);
   });
 };
 
@@ -64,18 +64,18 @@ const sendPeriodicMessageToAllClients = () => {
 };
 
 app.get("/settings/current", (req, res) => {
-  Settings.findById(settings._id, (err, settings) => {
+  Setting.findById(setting._id, (err, copiedSettings) => {
     if (err) throw err;
 
     res.status(200).json({
       success: true,
-      currentSettings: settings
+      currentSettings: copiedSettings
     });
   });
 });
 
 app.post("/settings/onevent/save", (req, res) => {
-  Settings.findOneAndUpdate(settings._id, req.body, (err, updatedSettings) => {
+  Setting.findOneAndUpdate(setting._id, req.body, (err, updatedSettings) => {
     if (err) throw err;
 
     res.status(200).json({
@@ -86,7 +86,7 @@ app.post("/settings/onevent/save", (req, res) => {
 });
 
 app.post("/settings/periodic/save", (req, res) => {
-  Settings.findOneAndUpdate(settings._id, req.body, (err, updatedSettings) => {
+  Setting.findOneAndUpdate(setting._id, req.body, (err, updatedSettings) => {
     if (err) throw err;
 
     if (updatedSettings.isPeriodicMessageSendingActive) {
@@ -107,7 +107,7 @@ app.get("/settings/periodic/start", (req, res) => {
     isPeriodicMessageSendingActive: true
   };
 
-  Settings.findOneAndUpdate(settings._id, data, err => {
+  Setting.findOneAndUpdate(setting._id, data, err => {
     if (err) throw err;
 
     sendPeriodicMessageToAllClients();
@@ -123,7 +123,7 @@ app.get("/settings/periodic/stop", (req, res) => {
     isPeriodicMessageSendingActive: false
   };
 
-  Settings.findOneAndUpdate(settings._id, data, err => {
+  Setting.findOneAndUpdate(setting._id, data, err => {
     if (err) throw err;
 
     clearInterval(timer);
@@ -146,19 +146,19 @@ app.get("/disconnect", (req, res) => {
 
 app.ws("/", ws => {
   ws.on("message", () => {
-    Settings.findById(settings._id, (err, settings) => {
+    Setting.findById(setting._id, (err, copiedSettings) => {
       if (err) throw err;
 
-      if (javaScriptUtils.isDefined(settings.onEventMessage)) {
-        ws.send(settings.onEventMessage);
+      if (javaScriptUtils.isDefined(copiedSettings.onEventMessage)) {
+        ws.send(copiedSettings.onEventMessage);
       }
     });
   });
 
-  Settings.findById(settings._id, (err, settings) => {
+  Setting.findById(setting._id, (err, copiedSettings) => {
     if (err) throw err;
 
-    if (settings.isPeriodicMessageSendingActive) {
+    if (copiedSettings.isPeriodicMessageSendingActive) {
       createPeriodicMessageInterval(ws);
     }
   });

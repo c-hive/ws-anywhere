@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const Schema = mongoose.Schema;
 
-const settings = new Schema({
+const setting = new Schema({
   onEventMessage: {
     type: String,
     default: null
@@ -20,4 +20,4 @@ const settings = new Schema({
   }
 });
 
-module.exports = mongoose.model("Settings", settings);
+module.exports = mongoose.model("Setting", setting);
