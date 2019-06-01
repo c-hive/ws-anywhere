@@ -25,6 +25,10 @@ window.onload = function() {
       if (parsedResponseData.success) {
         setInputValues(parsedResponseData.currentSettings);
       }
+    })
+    .catch(() => {
+      displayErrorElements(elementIds.onEvent, "Server error");
+      displayErrorElements(elementIds.periodic, "Server error");
     });
 
   createFeedbackElements();
@@ -342,6 +346,8 @@ function startSendingPeriodicMessage() {
         start: false,
         stop: true
       });
+
+      displayErrorElements(elementIds.periodic, "Server error");
     });
 }
 
@@ -365,5 +371,7 @@ function stopSendingPeriodicMessage() {
         start: true,
         stop: false
       });
+
+      displayErrorElements(elementIds.periodic, "Server error");
     });
 }

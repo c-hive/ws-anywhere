@@ -21,8 +21,10 @@ mongoose.connect(runtimeVariables.dbURI, err => {
     }
   }
 
-  Setting.countDocuments({}, (_, count) => {
-    const dbIsEmpty = count === 0;
+  Setting.find({}, (err, data) => {
+    if (err) throw err;
+
+    const dbIsEmpty = data.length === 0;
 
     if (dbIsEmpty) {
       setting = new Setting();
@@ -30,6 +32,8 @@ mongoose.connect(runtimeVariables.dbURI, err => {
       setting.save(err => {
         if (err) throw err;
       });
+    } else {
+      setting = data[0];
     }
   });
 });
