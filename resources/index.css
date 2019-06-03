@@ -40,10 +40,16 @@ button {
 
 .errorMsgBox {
   display: none;
-  width: 50%;
-  border: 3px solid red;
-  font-weight: bold;
-  background: #DBD9D9;
+  align-items: center;
+  width: 30%;
+  background: #e8aeae;
+  color: #2B2B2B;
+  text-align: left;
   margin: 0 auto;
-  padding: 15px;
+  padding: 10px 20px;
+  border-radius: 3px;
+}
+
+.errorMsgBox > img {
+  margin-right: 5px;
 }

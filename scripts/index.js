@@ -169,11 +169,21 @@ function displayErrorElements(elementIdsGroup, errorMessage) {
 function displayErrorMsgBox(errorMessage) {
   const errorMsgBoxElement = document.getElementById("errorMsgBox");
 
-  errorMsgBoxElement.innerText = errorMessage;
+  const errorMsgBoxTextElement = getErrorMessageBoxTextElement(errorMessage);
 
-  errorMsgBoxElement.style.display = "block";
+  errorMsgBoxElement.appendChild(errorMsgBoxTextElement);
+
+  errorMsgBoxElement.style.display = "flex";
 
   hideElementAfterMsElapsed(errorMsgBoxElement, 2500);
+}
+
+function getErrorMessageBoxTextElement(errorMessage) {
+  const errorMsgTextElement = document.createElement("P");
+
+  errorMsgTextElement.innerText = errorMessage;
+
+  return errorMsgTextElement;
 }
 
 function updatePeriodicActionButtonsDisabledProperty(btnStatuses) {
