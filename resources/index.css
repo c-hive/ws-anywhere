@@ -37,3 +37,13 @@ button {
     font-weight: bold;
     display: none;
 }
+
+.errorMsgBox {
+  display: none;
+  width: 50%;
+  border: 3px solid red;
+  font-weight: bold;
+  background: #DBD9D9;
+  margin: 0 auto;
+  padding: 15px;
+}

@@ -27,8 +27,7 @@ window.onload = function() {
       }
     })
     .catch(() => {
-      displayErrorElements(elementIds.onEvent, "Server error");
-      displayErrorElements(elementIds.periodic, "Server error");
+      displayErrorMsgBox("Server error");
     });
 
   createFeedbackElements();
@@ -165,6 +164,16 @@ function displayErrorElements(elementIdsGroup, errorMessage) {
     elementsGroup.errorSpan.style.display = "block";
     elementsGroup.errorSpan.innerText = errorMessage;
   }
+}
+
+function displayErrorMsgBox(errorMessage) {
+  const errorMsgBoxElement = document.getElementById("errorMsgBox");
+
+  errorMsgBoxElement.innerText = errorMessage;
+
+  errorMsgBoxElement.style.display = "block";
+
+  hideElementAfterMsElapsed(errorMsgBoxElement, 2500);
 }
 
 function updatePeriodicActionButtonsDisabledProperty(btnStatuses) {
@@ -347,7 +356,7 @@ function startSendingPeriodicMessage() {
         stop: true
       });
 
-      displayErrorElements(elementIds.periodic, "Server error");
+      displayErrorMsgBox("Server error");
     });
 }
 
@@ -372,6 +381,6 @@ function stopSendingPeriodicMessage() {
         stop: false
       });
 
-      displayErrorElements(elementIds.periodic, "Server error");
+      displayErrorMsgBox("Server error");
     });
 }
