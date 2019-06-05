@@ -365,8 +365,6 @@ function startSendingPeriodicMessage() {
         start: false,
         stop: true
       });
-
-      displayErrorMsgBox("Server error");
     });
 }
 
@@ -390,7 +388,5 @@ function stopSendingPeriodicMessage() {
         start: true,
         stop: false
       });
-
-      displayErrorMsgBox("Server error");
     });
 }
