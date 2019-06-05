@@ -174,8 +174,6 @@ function displayErrorMsgBox(errorMessage) {
   errorMsgBoxElement.appendChild(errorMsgBoxTextElement);
 
   errorMsgBoxElement.style.display = "flex";
-
-  hideElementAfterMsElapsed(errorMsgBoxElement, 2500);
 }
 
 function getErrorMessageBoxTextElement(errorMessage) {

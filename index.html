@@ -8,6 +8,11 @@
     </head>
     <body>
         <h1>ws-anywhere</h1>
+
+        <div id="errorMsgBox" class="errorMsgBox">
+          <img src="assets/error.png" width="25" height="25" alt="Error" />
+        </div>
+
         <h2>Customizable WebSocket test server</h2>
         <p>WebSocket connections can only be established on the index route.</p>
         <p>The objects are serialized as the WebSocket API doens't support sending raw objects. As a result, the received dummy data in the client side is stringified by <i>JSON.stringify()</i>.</p>
@@ -21,10 +26,6 @@
 
         <h3>How to use?</h3>
         <p>There are two different ways to use the server:
-
-        <div id="errorMsgBox" class="errorMsgBox">
-          <img src="assets/error.png" width="25" height="25" alt="Error" />
-        </div>
 
         <div>
             <h4>1. PER SEND EVENT</h4>
