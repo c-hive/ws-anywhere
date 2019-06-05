@@ -69,7 +69,7 @@ const sendPeriodicMessageToAllClients = () => {
 
 app.get("/settings/current", (req, res) => {
   Setting.findById(setting._id, (err, copiedSettings) => {
-    if (err) throw err;
+    if (!err) throw err;
 
     res.status(200).json({
       success: true,
