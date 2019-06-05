@@ -1,19 +1,14 @@
-const elementIds = {
-  onEvent: {
-    successImg: "onEventSuccessImg",
-    errorImg: "onEventErrorImg",
-    errorSpan: "onEventErrorSpan"
-  },
-  periodic: {
-    successImg: "periodicSuccessImg",
-    errorImg: "periodicErrorImg",
-    errorSpan: "periodicErrorSpan"
-  },
-  disconnect: {
-    successImg: "disconnectSuccessImg",
-    errorImg: "disconnectErrorImg",
-    errorSpan: "disconnectErrorSpan"
-  }
+const buttonRowIds = {
+  ON_EVENT: "onEvent",
+  PERIODIC: "periodic",
+  PERIODIC_ACTIONS: "periodicActions",
+  DISCONNECT: "disconnect"
+};
+
+const suffixes = {
+  SUCCESS_IMG: "SuccessImg",
+  ERROR_IMG: "ErrorImg",
+  ERROR_SPAN: "ErrorSpan"
 };
 
 window.onload = function() {
@@ -30,33 +25,31 @@ window.onload = function() {
       displayErrorMsgBox("Server error");
     });
 
-  createFeedbackElements();
+  createButtonRowElements();
 };
 
-function createFeedbackElements() {
-  Object.keys(elementIds).map(itemId => {
-    const elementIdsGroup = elementIds[itemId];
+function createButtonRowElements() {
+  Object.keys(buttonRowIds).map(id => {
+    const currentRowId = buttonRowIds[id];
 
-    const preparedFeedbackElements = getPreparedFeedbackElements(
-      elementIdsGroup
-    );
+    const styledRowElements = getStyledRowElements(currentRowId);
 
-    appendFeedbackElementsToItem(itemId, preparedFeedbackElements);
+    appendStyledRowElementsToRow(currentRowId, styledRowElements);
   });
 }
 
-function appendFeedbackElementsToItem(itemId, feedbackElements) {
-  const item = document.getElementById(itemId);
+function appendStyledRowElementsToRow(rowId, styledRowElements) {
+  const item = document.getElementById(rowId);
 
-  item.appendChild(feedbackElements.successImg);
-  item.appendChild(feedbackElements.errorImg);
-  item.appendChild(feedbackElements.errorSpan);
+  item.appendChild(styledRowElements.successImg);
+  item.appendChild(styledRowElements.errorImg);
+  item.appendChild(styledRowElements.errorSpan);
 }
 
-function getPreparedFeedbackElements(elementIdsGroup) {
-  const successImg = getSuccessImgElement(elementIdsGroup.successImg);
-  const errorImg = getErrorImgElement(elementIdsGroup.errorImg);
-  const errorSpan = getErrorSpanElement(elementIdsGroup.errorSpan);
+function getStyledRowElements(rowId) {
+  const successImg = getSuccessImgElement(rowId + suffixes.SUCCESS_IMG);
+  const errorImg = getErrorImgElement(rowId + suffixes.ERROR_IMG);
+  const errorSpan = getErrorSpanElement(rowId + suffixes.ERROR_SPAN);
 
   return {
     successImg,
@@ -65,10 +58,10 @@ function getPreparedFeedbackElements(elementIdsGroup) {
   };
 }
 
-function getSuccessImgElement(successImgId) {
+function getSuccessImgElement(imgId) {
   const successImg = document.createElement("IMG");
 
-  successImg.id = successImgId;
+  successImg.id = imgId;
   successImg.alt = "Success";
   successImg.src = "/assets/success.png";
   successImg.classList.add("statusImg");
@@ -76,10 +69,10 @@ function getSuccessImgElement(successImgId) {
   return successImg;
 }
 
-function getErrorImgElement(errorImgId) {
+function getErrorImgElement(imgId) {
   const errorImg = document.createElement("IMG");
 
-  errorImg.id = errorImgId;
+  errorImg.id = imgId;
   errorImg.alt = "Error";
   errorImg.src = "/assets/error.png";
   errorImg.classList.add("statusImg");
@@ -87,10 +80,10 @@ function getErrorImgElement(errorImgId) {
   return errorImg;
 }
 
-function getErrorSpanElement(errorSpanId) {
+function getErrorSpanElement(spanId) {
   const errorSpan = document.createElement("SPAN");
 
-  errorSpan.id = errorSpanId;
+  errorSpan.id = spanId;
   errorSpan.classList.add("errorMsg");
 
   return errorSpan;
@@ -120,10 +113,10 @@ function isJson(data) {
   }
 }
 
-function getElementsGroup(elementIdsGroup) {
-  const successImg = document.getElementById(elementIdsGroup.successImg);
-  const errorImg = document.getElementById(elementIdsGroup.errorImg);
-  const errorSpan = document.getElementById(elementIdsGroup.errorSpan);
+function getButtonRowElements(rowId) {
+  const successImg = document.getElementById(rowId + suffixes.SUCCESS_IMG);
+  const errorImg = document.getElementById(rowId + suffixes.ERROR_IMG);
+  const errorSpan = document.getElementById(rowId + suffixes.ERROR_SPAN);
 
   return {
     successImg,
@@ -138,31 +131,32 @@ function hideElementAfterMsElapsed(el, delayInMs) {
   }, delayInMs);
 }
 
-function hideElements(elements) {
-  elements.forEach(element => {
-    element.style.display = "none";
+function hideElements(buttonRowElements) {
+  buttonRowElements.forEach(rowElement => {
+    rowElement.style.display = "none";
   });
 }
 
-function displaySuccessImg(elementIdsGroup) {
-  const elementsGroup = getElementsGroup(elementIdsGroup);
+function displaySuccessImg(rowId) {
+  const buttonRowElements = getButtonRowElements(rowId);
 
-  elementsGroup.successImg.style.display = "block";
+  buttonRowElements.successImg.style.display = "block";
 
-  hideElements([elementsGroup.errorImg, elementsGroup.errorSpan]);
-  hideElementAfterMsElapsed(elementsGroup.successImg, 2500);
+  hideElements([buttonRowElements.errorImg, buttonRowElements.errorSpan]);
+
+  hideElementAfterMsElapsed(buttonRowElements.successImg, 2500);
 }
 
-function displayErrorElements(elementIdsGroup, errorMessage) {
-  const elementsGroup = getElementsGroup(elementIdsGroup);
+function displayErrorElements(rowId, errorMessage) {
+  const buttonRowElements = getButtonRowElements(rowId);
 
-  elementsGroup.errorImg.style.display = "block";
+  buttonRowElements.errorImg.style.display = "block";
 
-  hideElements([elementsGroup.successImg]);
+  hideElements([buttonRowElements.successImg]);
 
   if (errorMessage) {
-    elementsGroup.errorSpan.style.display = "block";
-    elementsGroup.errorSpan.innerText = errorMessage;
+    buttonRowElements.errorSpan.style.display = "block";
+    buttonRowElements.errorSpan.innerText = errorMessage;
   }
 }
 
@@ -233,11 +227,11 @@ function disconnectAllClients() {
       .then(response => response.json())
       .then(parsedResponse => {
         if (parsedResponse.success) {
-          displaySuccessImg(elementIds.disconnect);
+          displaySuccessImg(buttonRowIds.DISCONNECT);
         }
       })
       .catch(() => {
-        displayErrorElements(elementIds.disconnect);
+        displayErrorElements(buttonRowIds.DISCONNECT);
       });
   }
 }
@@ -293,16 +287,16 @@ function submitOnEventMessage() {
       .then(response => response.json())
       .then(parsedResponse => {
         if (parsedResponse.success) {
-          displaySuccessImg(elementIds.onEvent);
+          displaySuccessImg(buttonRowIds.ON_EVENT);
         }
       })
       .catch(() => {
-        displayErrorElements(elementIds.onEvent);
+        displayErrorElements(buttonRowIds.ON_EVENT);
       });
   } else {
     const errorMessage = "Invalid JSON format.";
 
-    displayErrorElements(elementIds.onEvent, errorMessage);
+    displayErrorElements(buttonRowIds.ON_EVENT, errorMessage);
   }
 }
 
@@ -324,7 +318,7 @@ function submitPeriodicSettings() {
       .then(response => response.json())
       .then(parsedResponse => {
         if (parsedResponse.success) {
-          displaySuccessImg(elementIds.periodic);
+          displaySuccessImg(buttonRowIds.PERIODIC);
 
           if (peridocActionButtonsAreDisabled()) {
             updatePeriodicActionButtonsDisabledProperty({
@@ -334,12 +328,12 @@ function submitPeriodicSettings() {
         }
       })
       .catch(() => {
-        displayErrorElements(elementIds.periodic);
+        displayErrorElements(buttonRowIds.PERIODIC);
       });
   } else {
     const errorMessage = "Invalid JSON format.";
 
-    displayErrorElements(elementIds.periodic, errorMessage);
+    displayErrorElements(buttonRowIds.PERIODIC, errorMessage);
   }
 }
 
@@ -356,6 +350,8 @@ function startSendingPeriodicMessage() {
         updatePeriodicActionButtonsDisabledProperty({
           stop: false
         });
+
+        displaySuccessImg(buttonRowIds.PERIODIC_ACTIONS);
       }
     })
     .catch(() => {
@@ -363,6 +359,8 @@ function startSendingPeriodicMessage() {
         start: false,
         stop: true
       });
+
+      displayErrorElements(buttonRowIds.PERIODIC_ACTIONS);
     });
 }
 
@@ -379,6 +377,8 @@ function stopSendingPeriodicMessage() {
         updatePeriodicActionButtonsDisabledProperty({
           start: false
         });
+
+        displaySuccessImg(buttonRowIds.PERIODIC_ACTIONS);
       }
     })
     .catch(() => {
@@ -386,5 +386,7 @@ function stopSendingPeriodicMessage() {
         start: true,
         stop: false
       });
+
+      displayErrorElements(buttonRowIds.PERIODIC_ACTIONS);
     });
 }
