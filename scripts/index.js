@@ -30,7 +30,9 @@ window.onload = function() {
         return response.json();
       }
 
-      throw new ResponseFailureError();
+      throw new ResponseFailureError(
+        "Error during querying the current settings, code: " + response.status
+      );
     })
     .then(parsedResponseData => {
       setInputValues(parsedResponseData.currentSettings);
@@ -238,7 +240,9 @@ function disconnectAllClients() {
           return displaySuccessImg(buttonRowIds.DISCONNECT);
         }
 
-        throw new ResponseFailureError();
+        throw new ResponseFailureError(
+          "Error during disconnecting all clients, code: " + response.status
+        );
       })
       .catch(() => {
         displayErrorElements(buttonRowIds.DISCONNECT, "Server error");
@@ -303,7 +307,9 @@ function submitOnEventMessage() {
           return displaySuccessImg(buttonRowIds.ON_EVENT);
         }
 
-        throw new ResponseFailureError();
+        throw new ResponseFailureError(
+          "Error during saving `onEvent` message, code: " + response.status
+        );
       })
       .catch(() => {
         displayErrorElements(buttonRowIds.ON_EVENT, "Server error");
@@ -340,7 +346,9 @@ function submitPeriodicSettings() {
             });
           }
         } else {
-          throw new ResponseFailureError();
+          throw new ResponseFailureError(
+            "Error during saving `periodic` message, code: " + response.status
+          );
         }
       })
       .catch(() => {
@@ -369,7 +377,9 @@ function startSendingPeriodicMessage() {
         return displaySuccessImg(buttonRowIds.PERIODIC_ACTIONS);
       }
 
-      throw new ResponseFailureError();
+      throw new ResponseFailureError(
+        "Error during clicking on the start button, code: " + response.status
+      );
     })
     .catch(() => {
       updatePeriodicActionButtonsDisabledProperty({
@@ -397,7 +407,9 @@ function stopSendingPeriodicMessage() {
         return displaySuccessImg(buttonRowIds.PERIODIC_ACTIONS);
       }
 
-      throw new ResponseFailureError();
+      throw new ResponseFailureError(
+        "Error during clicking on the stop button, code: " + response.status
+      );
     })
     .catch(() => {
       updatePeriodicActionButtonsDisabledProperty({
