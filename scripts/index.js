@@ -25,6 +25,9 @@ window.onload = function() {
       if (parsedResponseData.success) {
         setInputValues(parsedResponseData.currentSettings);
       }
+    })
+    .catch(() => {
+      displayErrorMsgBox("Server error");
     });
 
   createFeedbackElements();
@@ -161,6 +164,24 @@ function displayErrorElements(elementIdsGroup, errorMessage) {
     elementsGroup.errorSpan.style.display = "block";
     elementsGroup.errorSpan.innerText = errorMessage;
   }
+}
+
+function displayErrorMsgBox(errorMessage) {
+  const errorMsgBoxElement = document.getElementById("errorMsgBox");
+
+  const errorMsgBoxTextElement = getErrorMessageBoxTextElement(errorMessage);
+
+  errorMsgBoxElement.appendChild(errorMsgBoxTextElement);
+
+  errorMsgBoxElement.style.display = "flex";
+}
+
+function getErrorMessageBoxTextElement(errorMessage) {
+  const errorMsgTextElement = document.createElement("P");
+
+  errorMsgTextElement.innerText = errorMessage;
+
+  return errorMsgTextElement;
 }
 
 function updatePeriodicActionButtonsDisabledProperty(btnStatuses) {

@@ -37,3 +37,19 @@ button {
     font-weight: bold;
     display: none;
 }
+
+.errorMsgBox {
+  display: none;
+  align-items: center;
+  width: 30%;
+  background: #e8aeae;
+  color: #2B2B2B;
+  text-align: left;
+  margin: 0 auto;
+  padding: 10px 20px;
+  border-radius: 3px;
+}
+
+.errorMsgBox > img {
+  margin-right: 5px;
+}
