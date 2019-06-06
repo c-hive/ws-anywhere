@@ -224,11 +224,6 @@ function setInputValues(data) {
       start: data.isPeriodicMessageSendingActive,
       stop: !data.isPeriodicMessageSendingActive
     });
-  } else {
-    updatePeriodicActionButtonsDisabledProperty({
-      start: true,
-      stop: true
-    });
   }
 }
 
@@ -238,14 +233,15 @@ function disconnectAllClients() {
     const postUrl = "/disconnect";
 
     fetch(postUrl)
-      .then(response => response.json())
-      .then(parsedResponse => {
-        if (parsedResponse.success) {
-          displaySuccessImg(buttonRowIds.DISCONNECT);
+      .then(response => {
+        if (responseIsSuccess(response)) {
+          return displaySuccessImg(buttonRowIds.DISCONNECT);
         }
+
+        throw new ResponseFailureError();
       })
       .catch(() => {
-        displayErrorElements(buttonRowIds.DISCONNECT);
+        displayErrorElements(buttonRowIds.DISCONNECT, "Server error");
       });
   }
 }
@@ -284,7 +280,7 @@ function checkIfPeriodicMessageIsValid() {
 }
 
 function responseIsSuccess(response) {
-  return response.ok && response.status === 200;
+  return response.ok === true;
 }
 
 // eslint-disable-next-line no-unused-vars
