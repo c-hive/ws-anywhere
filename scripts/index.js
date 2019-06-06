@@ -21,6 +21,10 @@ const suffixes = {
   ERROR_SPAN: "ErrorSpan"
 };
 
+function responseIsSuccess(response) {
+  return response.ok === true;
+}
+
 window.onload = function() {
   const getUrl = "/settings/current";
 
@@ -281,10 +285,6 @@ function checkIfPeriodicMessageIsValid() {
   const settings = getPeriodicMessageSettings();
 
   return isJson(settings.periodicMessage);
-}
-
-function responseIsSuccess(response) {
-  return response.ok === true;
 }
 
 // eslint-disable-next-line no-unused-vars
