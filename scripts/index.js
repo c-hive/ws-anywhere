@@ -378,7 +378,8 @@ function startSendingPeriodicMessage() {
       }
 
       throw new ResponseFailureError(
-        "Error during clicking on the start button, code: " + response.status
+        "An error occurred while processing the start request, code: " +
+          response.status
       );
     })
     .catch(() => {
@@ -408,7 +409,8 @@ function stopSendingPeriodicMessage() {
       }
 
       throw new ResponseFailureError(
-        "Error during clicking on the stop button, code: " + response.status
+        "An error occurred while processing the stop request, code: " +
+          response.status
       );
     })
     .catch(() => {
