@@ -67,10 +67,10 @@ const sendPeriodicMessageToAllClients = () => {
   });
 };
 
-const settingsAreNotDefined = () => !javaScriptUtils.isDefined(setting);
+const settingIsNotDefined = () => !javaScriptUtils.isDefined(setting);
 
 app.get("/settings/current", (req, res) => {
-  if (settingsAreNotDefined()) {
+  if (settingIsNotDefined()) {
     return res.sendStatus(500);
   }
 
@@ -84,7 +84,7 @@ app.get("/settings/current", (req, res) => {
 });
 
 app.post("/settings/onevent/save", (req, res) => {
-  if (settingsAreNotDefined()) {
+  if (settingIsNotDefined()) {
     return res.sendStatus(500);
   }
 
@@ -96,7 +96,7 @@ app.post("/settings/onevent/save", (req, res) => {
 });
 
 app.post("/settings/periodic/save", (req, res) => {
-  if (settingsAreNotDefined()) {
+  if (settingIsNotDefined()) {
     return res.sendStatus(500);
   }
 
@@ -114,7 +114,7 @@ app.post("/settings/periodic/save", (req, res) => {
 });
 
 app.get("/settings/periodic/start", (req, res) => {
-  if (settingsAreNotDefined()) {
+  if (settingIsNotDefined()) {
     return res.sendStatus(500);
   }
 
@@ -132,7 +132,7 @@ app.get("/settings/periodic/start", (req, res) => {
 });
 
 app.get("/settings/periodic/stop", (req, res) => {
-  if (settingsAreNotDefined()) {
+  if (settingIsNotDefined()) {
     return res.sendStatus(500);
   }
 
@@ -150,7 +150,7 @@ app.get("/settings/periodic/stop", (req, res) => {
 });
 
 app.get("/disconnect", (req, res) => {
-  if (settingsAreNotDefined()) {
+  if (settingIsNotDefined()) {
     return res.sendStatus(500);
   }
 
