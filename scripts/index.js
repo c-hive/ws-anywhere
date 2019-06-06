@@ -378,7 +378,7 @@ function startSendingPeriodicMessage() {
       }
 
       throw new ResponseFailureError(
-        "An error occurred while processing the start request, code: " +
+        "An error occurred while processing start request, code: " +
           response.status
       );
     })
@@ -409,7 +409,7 @@ function stopSendingPeriodicMessage() {
       }
 
       throw new ResponseFailureError(
-        "An error occurred while processing the stop request, code: " +
+        "An error occurred while processing stop request, code: " +
           response.status
       );
     })
