@@ -1,3 +1,13 @@
+class ResponseFailureError extends Error {
+  constructor(...args) {
+    super(args);
+
+    Error.captureStackTrace(this, ResponseFailureError);
+
+    this.name = this.constructor.name;
+  }
+}
+
 const buttonRowIds = {
   ON_EVENT: "onEvent",
   PERIODIC: "periodic",
@@ -15,11 +25,15 @@ window.onload = function() {
   const getUrl = "/settings/current";
 
   fetch(getUrl)
-    .then(responseData => responseData.json())
-    .then(parsedResponseData => {
-      if (parsedResponseData.success) {
-        setInputValues(parsedResponseData.currentSettings);
+    .then(response => {
+      if (responseIsSuccess(response)) {
+        return response.json();
       }
+
+      throw new ResponseFailureError();
+    })
+    .then(parsedResponseData => {
+      setInputValues(parsedResponseData.currentSettings);
     })
     .catch(() => {
       displayErrorMsgBox("Server error");
@@ -269,6 +283,10 @@ function checkIfPeriodicMessageIsValid() {
   return isJson(settings.periodicMessage);
 }
 
+function responseIsSuccess(response) {
+  return response.ok && response.status === 200;
+}
+
 // eslint-disable-next-line no-unused-vars
 function submitOnEventMessage() {
   if (checkIfOnEventMessageIsValid()) {
@@ -284,14 +302,15 @@ function submitOnEventMessage() {
       method: "POST",
       body: JSON.stringify(onEventMessageSettings)
     })
-      .then(response => response.json())
-      .then(parsedResponse => {
-        if (parsedResponse.success) {
-          displaySuccessImg(buttonRowIds.ON_EVENT);
+      .then(response => {
+        if (responseIsSuccess(response)) {
+          return displaySuccessImg(buttonRowIds.ON_EVENT);
         }
+
+        throw new ResponseFailureError();
       })
       .catch(() => {
-        displayErrorElements(buttonRowIds.ON_EVENT);
+        displayErrorElements(buttonRowIds.ON_EVENT, "Server error");
       });
   } else {
     const errorMessage = "Invalid JSON format.";
@@ -315,9 +334,8 @@ function submitPeriodicSettings() {
       method: "POST",
       body: JSON.stringify(perodicMessageSettings)
     })
-      .then(response => response.json())
-      .then(parsedResponse => {
-        if (parsedResponse.success) {
+      .then(response => {
+        if (responseIsSuccess(response)) {
           displaySuccessImg(buttonRowIds.PERIODIC);
 
           if (peridocActionButtonsAreDisabled()) {
@@ -325,10 +343,12 @@ function submitPeriodicSettings() {
               start: false
             });
           }
+        } else {
+          throw new ResponseFailureError();
         }
       })
       .catch(() => {
-        displayErrorElements(buttonRowIds.PERIODIC);
+        displayErrorElements(buttonRowIds.PERIODIC, "Server error");
       });
   } else {
     const errorMessage = "Invalid JSON format.";
@@ -344,15 +364,16 @@ function startSendingPeriodicMessage() {
   });
 
   fetch("/settings/periodic/start")
-    .then(response => response.json())
-    .then(parsedResponse => {
-      if (parsedResponse.success) {
+    .then(response => {
+      if (responseIsSuccess(response)) {
         updatePeriodicActionButtonsDisabledProperty({
           stop: false
         });
 
-        displaySuccessImg(buttonRowIds.PERIODIC_ACTIONS);
+        return displaySuccessImg(buttonRowIds.PERIODIC_ACTIONS);
       }
+
+      throw new ResponseFailureError();
     })
     .catch(() => {
       updatePeriodicActionButtonsDisabledProperty({
@@ -360,7 +381,7 @@ function startSendingPeriodicMessage() {
         stop: true
       });
 
-      displayErrorElements(buttonRowIds.PERIODIC_ACTIONS);
+      displayErrorElements(buttonRowIds.PERIODIC_ACTIONS, "Server error");
     });
 }
 
@@ -371,15 +392,16 @@ function stopSendingPeriodicMessage() {
   });
 
   fetch("/settings/periodic/stop")
-    .then(response => response.json())
-    .then(parsedResponse => {
-      if (parsedResponse.success) {
+    .then(response => {
+      if (responseIsSuccess(response)) {
         updatePeriodicActionButtonsDisabledProperty({
           start: false
         });
 
-        displaySuccessImg(buttonRowIds.PERIODIC_ACTIONS);
+        return displaySuccessImg(buttonRowIds.PERIODIC_ACTIONS);
       }
+
+      throw new ResponseFailureError();
     })
     .catch(() => {
       updatePeriodicActionButtonsDisabledProperty({
@@ -387,6 +409,6 @@ function stopSendingPeriodicMessage() {
         stop: false
       });
 
-      displayErrorElements(buttonRowIds.PERIODIC_ACTIONS);
+      displayErrorElements(buttonRowIds.PERIODIC_ACTIONS, "Server error");
     });
 }
