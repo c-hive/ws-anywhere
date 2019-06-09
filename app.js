@@ -16,9 +16,9 @@ mongoose.connect(runtimeVariables.dbURI, err => {
   if (err) {
     if (err.name === "MongoNetworkError") {
       throw new Error("Incorrect MongoDB connection uri.");
-    } else {
-      throw err;
     }
+
+    throw err;
   }
 
   Setting.find({}, (err, data) => {
@@ -68,28 +68,36 @@ const sendPeriodicMessageToAllClients = () => {
 };
 
 app.get("/settings/current", (req, res) => {
+  if (!javaScriptUtils.isDefined(setting)) {
+    return res.sendStatus(500);
+  }
+
   Setting.findById(setting._id, (err, copiedSettings) => {
     if (err) throw err;
 
-    res.status(200).json({
-      success: true,
+    return res.status(200).json({
       currentSettings: copiedSettings
     });
   });
 });
 
 app.post("/settings/onevent/save", (req, res) => {
-  Setting.findOneAndUpdate(setting._id, req.body, (err, updatedSettings) => {
+  if (!javaScriptUtils.isDefined(setting)) {
+    return res.sendStatus(500);
+  }
+
+  Setting.findOneAndUpdate(setting._id, req.body, err => {
     if (err) throw err;
 
-    res.status(200).json({
-      success: true,
-      currentSettings: updatedSettings
-    });
+    return res.sendStatus(200);
   });
 });
 
 app.post("/settings/periodic/save", (req, res) => {
+  if (!javaScriptUtils.isDefined(setting)) {
+    return res.sendStatus(500);
+  }
+
   Setting.findOneAndUpdate(setting._id, req.body, (err, updatedSettings) => {
     if (err) throw err;
 
@@ -99,14 +107,15 @@ app.post("/settings/periodic/save", (req, res) => {
       sendPeriodicMessageToAllClients();
     }
 
-    res.status(200).send({
-      success: true,
-      currentSettings: updatedSettings
-    });
+    return res.sendStatus(200);
   });
 });
 
 app.get("/settings/periodic/start", (req, res) => {
+  if (!javaScriptUtils.isDefined(setting)) {
+    return res.sendStatus(500);
+  }
+
   const data = {
     isPeriodicMessageSendingActive: true
   };
@@ -116,13 +125,15 @@ app.get("/settings/periodic/start", (req, res) => {
 
     sendPeriodicMessageToAllClients();
 
-    res.status(200).json({
-      success: true
-    });
+    return res.sendStatus(200);
   });
 });
 
 app.get("/settings/periodic/stop", (req, res) => {
+  if (!javaScriptUtils.isDefined(setting)) {
+    return res.sendStatus(500);
+  }
+
   const data = {
     isPeriodicMessageSendingActive: false
   };
@@ -132,20 +143,20 @@ app.get("/settings/periodic/stop", (req, res) => {
 
     clearInterval(timer);
 
-    res.status(200).json({
-      success: true
-    });
+    return res.sendStatus(200);
   });
 });
 
 app.get("/disconnect", (req, res) => {
+  if (!javaScriptUtils.isDefined(setting)) {
+    return res.sendStatus(500);
+  }
+
   expressWs.getWss().clients.forEach(client => {
     client.close();
   });
 
-  res.status(200).json({
-    success: true
-  });
+  return res.sendStatus(200);
 });
 
 app.ws("/", ws => {
