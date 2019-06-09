@@ -34,9 +34,7 @@ window.onload = function() {
         return response.json();
       }
 
-      throw new ResponseFailureError(
-        "Error during querying the current settings, code: " + response.status
-      );
+      throw new ResponseFailureError();
     })
     .then(parsedResponseData => {
       setInputValues(parsedResponseData.currentSettings);
@@ -238,19 +236,13 @@ function disconnectAllClients() {
   if (confirm("Disconnect all the clients?")) {
     const postUrl = "/disconnect";
 
-    fetch(postUrl)
-      .then(response => {
-        if (responseIsSuccess(response)) {
-          return displaySuccessImg(buttonRowIds.DISCONNECT);
-        }
+    fetch(postUrl).then(response => {
+      if (responseIsSuccess(response)) {
+        return displaySuccessImg(buttonRowIds.DISCONNECT);
+      }
 
-        throw new ResponseFailureError(
-          "Error during disconnecting all clients, code: " + response.status
-        );
-      })
-      .catch(() => {
-        displayErrorElements(buttonRowIds.DISCONNECT, "Server error");
-      });
+      displayErrorElements(buttonRowIds.DISCONNECT, "Server error");
+    });
   }
 }
 
@@ -301,19 +293,13 @@ function submitOnEventMessage() {
       },
       method: "POST",
       body: JSON.stringify(onEventMessageSettings)
-    })
-      .then(response => {
-        if (responseIsSuccess(response)) {
-          return displaySuccessImg(buttonRowIds.ON_EVENT);
-        }
+    }).then(response => {
+      if (responseIsSuccess(response)) {
+        return displaySuccessImg(buttonRowIds.ON_EVENT);
+      }
 
-        throw new ResponseFailureError(
-          "Error during saving `onEvent` message, code: " + response.status
-        );
-      })
-      .catch(() => {
-        displayErrorElements(buttonRowIds.ON_EVENT, "Server error");
-      });
+      displayErrorElements(buttonRowIds.ON_EVENT, "Server error");
+    });
   } else {
     const errorMessage = "Invalid JSON format.";
 
@@ -335,25 +321,19 @@ function submitPeriodicSettings() {
       },
       method: "POST",
       body: JSON.stringify(perodicMessageSettings)
-    })
-      .then(response => {
-        if (responseIsSuccess(response)) {
-          displaySuccessImg(buttonRowIds.PERIODIC);
+    }).then(response => {
+      if (responseIsSuccess(response)) {
+        displaySuccessImg(buttonRowIds.PERIODIC);
 
-          if (peridocActionButtonsAreDisabled()) {
-            updatePeriodicActionButtonsDisabledProperty({
-              start: false
-            });
-          }
-        } else {
-          throw new ResponseFailureError(
-            "Error during saving `periodic` message, code: " + response.status
-          );
+        if (peridocActionButtonsAreDisabled()) {
+          updatePeriodicActionButtonsDisabledProperty({
+            start: false
+          });
         }
-      })
-      .catch(() => {
+      } else {
         displayErrorElements(buttonRowIds.PERIODIC, "Server error");
-      });
+      }
+    });
   } else {
     const errorMessage = "Invalid JSON format.";
 
@@ -377,10 +357,7 @@ function startSendingPeriodicMessage() {
         return displaySuccessImg(buttonRowIds.PERIODIC_ACTIONS);
       }
 
-      throw new ResponseFailureError(
-        "An error occurred while processing start request, code: " +
-          response.status
-      );
+      throw new ResponseFailureError();
     })
     .catch(() => {
       updatePeriodicActionButtonsDisabledProperty({
@@ -408,10 +385,7 @@ function stopSendingPeriodicMessage() {
         return displaySuccessImg(buttonRowIds.PERIODIC_ACTIONS);
       }
 
-      throw new ResponseFailureError(
-        "An error occurred while processing stop request, code: " +
-          response.status
-      );
+      throw new ResponseFailureError();
     })
     .catch(() => {
       updatePeriodicActionButtonsDisabledProperty({
