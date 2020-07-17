@@ -11,7 +11,7 @@
 - Send custom message periodically
 - Disconnect from clients
 
-## Deployment
+## Usage
 
 Use this script to (re)set the app in an idempotent way on Heroku.
 
